@@ -1,0 +1,3 @@
+# TODO: remove when django 1.7 released
+https://github.com/django/django/archive/1.7c1.zip
+
