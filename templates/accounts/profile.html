@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load string_filter %}
+{% block title %}{{master.username}}的个人主页{% endblock %}
+
+{% block content %}
+<div id="main">
+  <div class="two doubling column ui grid" id="profile">
+    <div class="column">
+      <div class="ui segment" style="text-align:center;">
+        <div id="profile-avatar">
+          <a href="#" class="circular ui images"><img src="http://www.gravatar.com/avatar/{{ request.user.email|md5hash }}" /></a>
+        </div>
+        <h2>{{master.username}}{%if request.user.id == master.id %}<a class="btn btn-success" href="/settings/"></a> {%endif%}</h2>
+        <div class="ui relaxed horizontal list">
+          <div class="item">
+            <div class="content">
+              <span class="number">{{user_profile.money}}</span>
+              <div class="description">金币</div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <span class="number">{{user_profile.credit}}</span>
+              <div class="description">积分</div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="content">
+              <span class="number">{{count}}</span>
+              <div class="description">发帖数</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="ui segment">
+        
+      </div>
+    </div>
+    <div class="column" id="profile-posts">
+      <h4 class="ui top attached header">最近的帖子</h4>
+      <div class="ui segment attached">
+        <div class="posts">
+          {% for post in recent_posts %}
+          <div class="post-preview">
+            <a href="/post/{{post.id}}/">{{post.title}}</a>
+            <small>{{post.created_at|date:"Y-m-d"}}</small>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html"  %}
+{% block title %}登录{% endblock %}
+
+{% block content %}
+<div id="main">
+  <div class="ui segment">
+    <div class="ui breadcrumb">
+      <a class="section" href="/">首页</a>
+      <div class="divider"> / </div>
+      <div class="active section">登陆</div>
+    </div>
+  </div>
+
+  <div class="two column doubling ui grid">
+    <div class="column">
+    {% if not user.is_authenticated %}
+      {% if request.GET.next == '/settings/' %}  <div class="ui message red">需要登录才能访问个人中心</div> {% endif %}
+      <div class="ui segment">
+      <div class="ui form ">
+      <form id="js-id-form-login" action="" method="post" class="form-horizontal">{% csrf_token %}
+        {{form.non_field_errors}}
+        <div class="field">
+          <label>用户名</label>
+          {{form.username}}
+          <div class="ui red pointing above ui label" style="display: none;">{{form.username.errors}}</div>
+        </div>
+        <div class="field">
+          <label>密码</label>
+          {{form.password}}
+          <div class="ui red pointing above ui label" style="display:none;">{{form.password.errors}}</div>
+        </div>
+        <input type="hidden" name="next" value="/" />
+        <button class="ui green button">登录</button>
+      </form>
+      </div>
+      </div>
+
+    {% else %}
+      <script type="text/javascript">window.location = '/profile/{{request.user.id}}/';</script>
+    {% endif %}
+    </div>
+    <div class="column">
+      <div class="ui segment" style="">
+        <p>还没有账号？<a href="{% url 'accounts.views.register' %}" class="btn btn-success">注册</a>或是使用社交帐号登录</p>
+        <p><span id="qq_login_btn"></span></p>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+QC.Login({
+  btnId:"qq_login_btn",
+  size: "A_L"
+});
+</script>
+{% endblock %}

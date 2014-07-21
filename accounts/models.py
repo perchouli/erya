@@ -2,7 +2,7 @@
 from django.db import models
 
 from django.contrib.auth.models import User
-from threads.models import Thread, Post
+from posts.models import Post, Reply
 
 
 class UserProfile(models.Model):
@@ -17,15 +17,6 @@ class UserProfile(models.Model):
 
     def __unicode__(self):
         return self.user.username
-
-    def count(self):
-        return {
-            'post': Post.objects.filter(author=self.user).count(),
-            'thread': Thread.objects.filter(author=self.user).count(),
-        }
-
-    def is_student(self):
-        return True if Student.objects.filter(user=self.user).count() else False
 
 def create_user_profile(sender=None, instance=None, created=False, **kwargs):
     if created:

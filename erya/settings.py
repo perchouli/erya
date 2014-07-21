@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'accounts',
-    'threads',
+    'posts',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -49,6 +49,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'django.middleware.locale.LocaleMiddleware',
 )
 
 ROOT_URLCONF = 'erya.urls'
@@ -93,3 +95,15 @@ STATICFILES_DIRS = (
 TEMPLATE_DIRS = [
     os.path.join(BASE_DIR, 'templates')
 ]
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.media',
+    'django.core.context_processors.request',
+    'django.core.context_processors.static',
+    'django.core.context_processors.tz',
+    'django.contrib.messages.context_processors.messages',
+)
+# import sys
+# sys.path.append(os.path.join(BASE_DIR, 'threads', 'templatetags'))

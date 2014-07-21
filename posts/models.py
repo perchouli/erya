@@ -31,7 +31,7 @@ class CategoryTag(models.Model):
         ordering = ['sort']
 
 
-class Thread(models.Model):
+class Post(models.Model):
     title = models.CharField(max_length=48)
     category = models.ForeignKey(Category)
     created_at = models.DateTimeField(auto_now_add=True, editable=True)
@@ -49,8 +49,8 @@ class Thread(models.Model):
         return self.title
 
 
-class Post(models.Model):
-    thread = models.ForeignKey(Thread, related_name='thread')
+class Reply(models.Model):
+    post = models.ForeignKey(Post, related_name='post')
     created_at = models.DateTimeField(auto_now_add=True, editable=True)
     author = models.ForeignKey(User)
     content = models.TextField()
