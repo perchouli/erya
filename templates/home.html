@@ -1,3 +1,51 @@
-{% extends "base.html" %}
-
+{% extends 'base.html' %}
+{% load string_filter users_tags %}
 {% block title %}首页{% endblock %}
+
+{% block content %}
+<div id="main">
+  <div class="ui grid" id="home">
+    <div class="twelve floated wide column" style="margin: 0px;">
+      <div class="three column doubling ui grid">
+      {% for category in CATEGORIES %}
+        <div class="column">
+          <div class="category">
+            <header class="header" onclick="location.href='{% url 'category' category.id %}';">
+              <i class="icon {{ category.icon }}"></i>
+              <p class="meta"></p>
+            </header>
+            <div class="title"><h2><a href="{% url 'category' category.id %}">{{ category.name }}</a></h2></div>
+            <div class="posts">
+              {% for post in category.posts %}
+              <div class="post-preview">
+                <a href="{% url 'profile' post.author.id %}" title="{{ post.author.username }}" style="float:left;"><img class="ui image avatar" src="{{ request.user.email|gravatar }}" /></a>
+                <div class="post-content">{{ post.content|removetags:'p div img'|safe }}</div>
+                <div class="meta">{{ post.created_at|date:"Y-m-d H:i:s" }} | <a href="{% url 'post_detail' post.id %}">阅读全文</a></div>
+                <div class="clearfix"></div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+      </div>
+    </div>
+
+    <div class="right floated four wide column">
+      <div class="ui segment">
+      Erya是基于SemanticUI开发的内容发布系统，主要用来搭建BBS，也可以做Blog使用。遵守GPLV3协议。
+      </div>
+      <div class="ui segment">
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+
+</script>
+{% endblock %}

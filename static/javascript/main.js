@@ -18,3 +18,38 @@ for (var i = 0; i < inputs.length; i++) {
     }
   });
 };
+
+var ajaxWrapper = function (method, url, data, callback) {
+  var xhr = new XMLHttpRequest(),
+    response,
+    params;
+  if (!data) data = {};
+
+  function serialize (obj) {
+    var str = [];
+    for(var p in obj)
+       str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+    return str.join("&");
+  }
+
+  xhr.onreadystatechange = function () {
+    if (xhr.responseText && xhr.readyState == 4 && xhr.status == 200) {
+      try {
+        response = JSON.parse(xhr.responseText);
+      } catch (e) {
+        response = xhr.responseText;
+      }
+      callback(response);
+    }
+  };
+  if (method == 'POST') {
+    xhr.open(method, url, true);
+    xhr.send(data);
+  }
+  else {
+    params = (typeof(data) === 'object') ? serialize(data) : data;
+    xhr.open(method, url + (params ? '?' + params : ''), true);
+    xhr.send();
+  }
+  return response;
+};

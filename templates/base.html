@@ -1,4 +1,4 @@
-{% load string_filter %}
+{% load string_filter users_tags %}
 <!DOCTYPE HTML>
 <html lang="zh-cn">
 </head>
@@ -15,8 +15,8 @@
 <body ontouchstart>
   <div id="top-menu" class="ui inverted menu">
     <a class="logo item" href="/">ERYA</a>
-    {% for category in request.session.categories %}
-      <a class="item" href="categor/{{category.id}}/" title="{{category.name}}"><i class="icon category{{category.id}}"></i></a>
+    {% for category in CATEGORIES %}
+      <a class="item" href="{% url 'category' category.id %}" title="{{category.name}}"><i class="icon {{category.icon}}"></i></a>
     {% endfor %}
     <div class="section ui dropdown link item">
       <i class="icon block layout"></i>
@@ -31,7 +31,7 @@
     </div>
     <div class="right menu">
       {% if user.is_authenticated %}
-      <a class="item" href="{% url 'profile' request.user.id %}"><img class="ui avatar image" src="http://www.gravatar.com/avatar/{{ request.user.email|md5hash }}" width="20" /></a>
+      <a class="item" href="{% url 'profile' request.user.id %}"><img class="ui avatar image" src="{{ request.user.email|gravatar }}"/></a>
       <a class="item" href="{% url 'profile' request.user.id %}">{{ request.user.username }}</a>
       <a class="item" href="{% url 'django.contrib.auth.views.logout' %}">退出</a>
       {% else %}

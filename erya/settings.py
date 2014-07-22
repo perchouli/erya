@@ -104,6 +104,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
+
+    'erya.context_processors.categories',
 )
 # import sys
 # sys.path.append(os.path.join(BASE_DIR, 'threads', 'templatetags'))

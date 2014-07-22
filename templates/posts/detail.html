@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% load string_filter users_tags %}
+{% block title %}{{post.title}}{% endblock %}
+
+{% block content %}
+<style>
+.ui.modal>.content {padding: .7em;}
+.ui.modal>.buttons {text-align: right; padding: 1rem 1rem;}
+</style>
+<div id="main">
+  <div class="ui segment">
+    <div class="ui breadcrumb">
+      <a class="section" href="/">首页</a>
+      <div class="divider"> / </div>
+      <a class="section" href="{% url 'category' post.category.id %}">{{post.category.name}}</a>
+      <div class="divider"> / </div>
+      <div class="active section">{{post.title}}</div>
+    </div>
+  </div>
+  
+  <div id="post-and-reply">
+    <div class="ui segment">
+      <a href="#" class="avatar"><img class="ui image avatar" src="{{ post.author.email|gravatar }}" /></a>
+      <div class="content">{{ post.content|safe }}</div>
+      <div class="footer">
+        <div class="post-toolbar">
+          <ul>
+            <li><a href="javascript:void(0)" class="js-reply-post"><i class="reply mail icon"></i>回复</a></li>
+            {% if request.user = post.author or user.is_superuser %}
+            <!-- <li><a href="/post/edit/{{post.id}}/"><i class="edit sign icon"></i>编辑</a></li> -->
+            {% endif %}
+          </ul>
+        </div>
+        <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ post.author }}</a> | {{ post.created_at| date:"Y-m-d H:i:s" }}</div>
+      </div>
+    </div>
+
+    {% for reply in post_replies %}
+    <div class="ui segment">
+      <a href="#" class="avatar"><img class="ui image avatar" src="{{ reply.author.email|gravatar }}" /></a>
+      <div class="content">{{ reply.content|safe }}</div>
+      <div class="footer">
+        <div class="post-toolbar">
+          <ul>
+            <li><a href="javascript:void(0)" class="js-reply-post" data-username="{{ reply.author.username }}"><i class="reply mail icon"></i>回复</a></li>
+            {% if request.user = reply.author or user.is_superuser %}<!-- <li><a href="javascript:void(0)"><i class="edit sign icon"></i>编辑</a></li> -->{% endif %}
+          </ul>
+        </div>
+        <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ reply.author }}</a> | {{ reply.created_at| date:"Y-m-d H:i:s" }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="ui modal" id="js-id-add-post-modal">
+<!--   <i class="close icon"></i> -->
+  <div class="content">
+    <div class="ui form">
+      <div class="field">
+        <div class="input"><input type="text" value="回复 {{post.title}}" disabled /></div>
+      </div>
+      <div class="field">
+        <div id="js-id-reply-editor"></div>
+        <form id="jd-id-form-reply">{% csrf_token %}
+        <textarea name="content" style="display: none;"></textarea>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="buttons">
+    <a href="javascript:void(0)" class="ui button green" id="js-id-add-reply">提交</a>
+    <div class="ui button" onclick="$('#js-id-add-post-modal').modal('hide');">取消</div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+
+
+<script>
+if (location.hash == '#latest') window.scrollTo(0, document.body.scrollHeight);
+
+function renderReply (replyId) {
+
+  ajaxWrapper('GET', '/posts/reply/{{ post.id }}/', {'reply_id': replyId}, function (response) {
+    var newReply = window.newReply = document.getElementById('post-and-reply').querySelector('.segment').cloneNode(true),
+      user = response.user;
+    newReply.querySelector('.avatar img').src = response.user.gravatar;
+    newReply.querySelector('.content').innerHTML = response.content;
+    newReply.querySelector('.footer .meta').innerHTML = '<a href="/profile/'+ user.id +'/">'+ user.name +'</a> | '+ response.created_at;
+    document.getElementById('post-and-reply').appendChild(newReply);
+    window.scrollTo(0, document.body.scrollHeight);
+  });
+
+}
+
+// 点击弹出的modal去除error样式类
+$('#js-id-add-post-modal').on('click', function (e) { $(this).find('.field').removeClass('error'); e.stopPropagation(); e.preventDefault();});
+
+// post回复内容到后台
+document.getElementById('js-id-add-reply').addEventListener('click', function (event) {
+  if (editor.getText().trim() == '') {
+    document.getElementById('js-id-reply-editor').parentElement.className = 'field error';
+    event.stopPropagation();
+    event.preventDefault();
+    return false;
+  }
+  var form = document.getElementById('jd-id-form-reply');
+  form.querySelector('textarea').innerText = editor.getHTML();
+
+  var data = new FormData(form);
+  ajaxWrapper('POST', '/posts/reply/{{ post.id }}/', data, function (response) {
+    editor.setHTML('<p></p>');
+    $('#js-id-add-post-modal').modal('hide');
+    renderReply(response);
+  });
+});
+
+
+// 弹出[回复]Modal
+document.getElementById('main').addEventListener('click', function (event) {
+  if (event.srcElement.className == 'js-reply-post') {
+    var username = event.srcElement.getAttribute('data-username');
+    {% if not user.is_authenticated %}
+    alert('请先登陆');
+    location.href = '/login/?next=/post/{{post.id}}/'
+    return false;
+    {% endif %}
+
+    $('#js-id-add-post-modal')
+      .modal('setting', {
+        onShow: function () {
+          window.editor = new Quill('#js-id-reply-editor');
+          if (username) editor.setHTML('<span style="color:#638911" data-username="'+ username +'">@'+ username +'</span>&nbsp;');
+          // editor.addModule('toolbar', { container: '#toolbar' });
+        }
+      })
+      .modal('show');
+
+    event.stopPropagation();
+    event.preventDefault();
+  }
+});
+
+var images = document.querySelectorAll('#post-and-reply .content img');
+for (var i = 0; i < images.length; i++) {
+  images[i].className = 'ui image';
+}
+
+</script>
+{% endblock %}
