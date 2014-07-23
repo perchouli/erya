@@ -33,10 +33,21 @@
 
     <div class="right floated four wide column">
       <div class="ui segment">
-      Erya是基于SemanticUI开发的内容发布系统，主要用来搭建BBS，也可以做Blog使用。遵守GPLV3协议。
+      <p>Erya是基于SemanticUI开发的内容发布系统，主要用来搭建BBS，关注多屏自适应和前端实时交互。</p>
+      <iframe src="http://ghbtns.com/github-btn.html?user=perchouli&repo=erya&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
       </div>
-      <div class="ui segment">
-
+      <h4 class="ui top attached header">最新回复</h4>  
+      <div class="ui segment attached">
+        <div class="posts">
+          {% for reply in recent_replies %}
+          <div class="post-preview">
+            <a href="{% url 'profile' reply.author.id %}" class="avatar" title="{{ reply.author.username }}"><img class="ui image avatar" src="{{ reply.author.email|gravatar }}" /></a></a>
+            <div class="post-content">{{ reply.content|removetags:'p div img'|safe }}</div>
+            <div class="meta">{{ reply.created_at|date:"H:i:s" }} | <a href="{% url 'post_detail' reply.post.id %}">阅读全文</a></div>
+            <div class="clearfix"></div>
+          </div>
+          {% endfor %}
+        </div>
       </div>
     </div>
 

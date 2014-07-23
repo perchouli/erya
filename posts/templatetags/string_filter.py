@@ -19,7 +19,3 @@ def substring(value, arg):
         return value[0:length] + '...'
 substring.is_safe = True
 substring = stringfilter(substring)
-
-@register.filter
-def md5hash(value):
-    return hashlib.md5(value.encode('utf-8').lower()).hexdigest()

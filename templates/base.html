@@ -16,7 +16,7 @@
   <div id="top-menu" class="ui inverted menu">
     <a class="logo item" href="/">ERYA</a>
     {% for category in CATEGORIES %}
-      <a class="item" href="{% url 'category' category.id %}" title="{{category.name}}"><i class="icon {{category.icon}}"></i></a>
+      <a class="item" href="{% url 'category' category.id %}" title="{{ category.name }}"><i class="icon {{ category.icon }}"></i></a>
     {% endfor %}
     <div class="section ui dropdown link item">
       <i class="icon block layout"></i>
@@ -51,7 +51,10 @@
 <script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="" data-redirecturi="" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}javascript/main.js"></script>
 <script>
-$('.ui.dropdown').dropdown();
+$('#top-menu .ui.dropdown').dropdown();
+$('#top-menu a.item').popup({
+  delay: 50
+});
 </script>
 {% block script %}{% endblock %}
 </body>

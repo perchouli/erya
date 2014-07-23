@@ -47,10 +47,10 @@
 
         <button type="submit" class="ui blue submit button">提交</button><div type="submit" class="ui button" style="margin-left: 20px;" id="js-id-cancel-button">取消</div>
       </form>
-      <form enctype="multipart/form-data">
-        <input id="js-id-input-upload-photo" name="upfile" type="file" accept="image/jpeg,image/jpg,image/png,image/x-png;capture=camera" style="display: none;" /> <!--multiple-->
+      <!--form enctype="multipart/form-data">
+        <input id="js-id-input-upload-photo" name="upfile" type="file" accept="image/jpeg,image/jpg,image/png,image/x-png;capture=camera" style="display: none;" />
         <i class="photo icon" id="js-id-icon-photo"></i>
-      </form>
+      </form-->
       {% else %}
       <div class="ui floating message">
         <strong>发布信息前请先<a href="/login/?next=/post/category/{{category.id}}/">登录</a>。</strong> 
@@ -99,11 +99,10 @@ photoInput.addEventListener('change', function () {
       $('#js-id-mask').addClass('active');
     },
     success: function (response) {
-      editor.insertEmbed(editor.getLength(), 'image', 'http://img.56we.com/{{request.user.id}}/' + response + '!main');
+      editor.insertEmbed(editor.getLength(), 'image', '/{{request.user.id}}/' + response + '!main');
       $('#js-id-mask').removeClass('active');
     },
     error: $.noop,
-    // Form data
     data: formData,
     cache: false,
     contentType: false,

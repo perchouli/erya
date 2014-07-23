@@ -33,7 +33,7 @@
     </div>
 
     {% for reply in post_replies %}
-    <div class="ui segment">
+    <div class="ui segment" id="js-id-reply-{{ reply.id }}">
       <a href="#" class="avatar"><img class="ui image avatar" src="{{ reply.author.email|gravatar }}" /></a>
       <div class="content">{{ reply.content|safe }}</div>
       <div class="footer" data-object-id="{{ reply.id }}" data-type="reply">
@@ -183,15 +183,13 @@ function removeObject (objectId, type) {
       return;
     }
     else {
-      var doms = document.querySelectorAll('#post-and-reply .segment .footer');
-      for (var i = 0; i < doms.length; i++) {
-        if (doms[i].getAttribute('data-object-id') != objectId) continue;
-        doms[i].parentElement.style.opacity = 0;
-        sleep(300, function () {
-          doms[i-1].parentElement.remove();
-        });
-      }
+      var reply = document.getElementById('js-id-reply-'+ objectId);
+      reply.style.opacity = 0;
+      sleep(300, function () {
+        reply.parentElement.remove();
+      });
     }
+
   });
 }
 
