@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load string_filter %}
+{% load string_filter users_tags %}
 {% block title %}{{master.username}}的个人主页{% endblock %}
 
 {% block content %}
@@ -8,7 +8,7 @@
     <div class="column">
       <div class="ui segment" style="text-align:center;">
         <div id="profile-avatar">
-          <a href="#" class="circular ui images"><img src="http://www.gravatar.com/avatar/{{ request.user.email|md5hash }}" /></a>
+          <a href="#" class="circular ui images"><img src="{{ master.user.email|gravatar }}" /></a>
         </div>
         <h2>{{master.username}}{%if request.user.id == master.id %}<a class="btn btn-success" href="/settings/"></a> {%endif%}</h2>
         <div class="ui relaxed horizontal list">
