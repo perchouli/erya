@@ -1,3 +1,19 @@
+@keyframes removed-item-animation {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(4);
+  }
+}
+
+.removed {
+  animation: removed-item-animation .6s;
+  transform-origin: 50% 50%;
+}
+
 .clearfix:after {content: ".";display: block;height: 0; clear: both; visibility: hidden;}
 .clearfix{display: inline-block;}
 * html .clearfix{height: 1%;}
@@ -120,6 +136,10 @@ body {
 }
 
 #post-and-reply {
+  .segment {
+    padding-bottom: 0px;
+    transition: all 0.3s ease;
+  }
   .avatar {
     float: left;
     img.avatar {
@@ -135,6 +155,7 @@ body {
   .footer {
     padding-top: 15px;
     border-top: 1px solid #ddd;
+    height: 2.3rem;
     .post-toolbar {
       ul {
         margin: 0px;
@@ -183,17 +204,19 @@ body {
 
 #footer {
   text-align: center;
+  margin: 10px 0px;
 }
 
 /* RESET SEMANTIC-UI START */
 .ui.segment {
   border-radius: 0px;
+  -webkit-animation-name: new-slide-name;
+  -webkit-animation-duration: 7s;
+  -webkit-animation-iteration-count: 3;
 }
 @media only screen and (max-width: 767px) {
-  #home {
-    .ui.grid>.twelve.wide.column, .ui.grid>.four.wide.column {
-      width: 100%;
-    }
+  #home.ui.grid>.twelve.wide.column, .ui.grid>.four.wide.column {
+    width: 100%;
   }
 }
 /* RESET SEMANTIC-UI END */

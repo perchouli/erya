@@ -53,3 +53,10 @@ var ajaxWrapper = function (method, url, data, callback) {
   }
   return response;
 };
+
+          
+function sleep (millis, callback) {
+  setTimeout(function () {
+    callback();
+  }, millis);
+}

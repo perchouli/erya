@@ -2,7 +2,7 @@ from django.db import models
 
 from django.contrib.auth.models import User
 
-from .managers import CategoryManager
+from .managers import PostManager
 
 class Category(models.Model):
     name = models.CharField(max_length=32)
@@ -42,12 +42,26 @@ class CategoryTag(models.Model):
 
 
 class Post(models.Model):
+    STATUS_REVIEW = 'review'
+    STATUS_APPROVED = 'approved'
+    STATUS_REJECTED = 'rejected'
+    STATUS_REMOVED = 'removed'
+    STATUS_EXPIRED = 'expired'
+
+    STATUS_CHOICES = (
+        (STATUS_REVIEW, u'待审核'),
+        (STATUS_APPROVED, u'已发布'),
+        (STATUS_REJECTED, u'已拒绝'),
+        (STATUS_REMOVED, u'已删除'),
+        (STATUS_EXPIRED, u'已过期'),
+    )
+    objects = PostManager()
     title = models.CharField(max_length=48)
     category = models.ForeignKey(Category)
     created_at = models.DateTimeField(auto_now_add=True, editable=True)
     content = models.TextField()
     tag = models.ForeignKey(CategoryTag, max_length=64, blank=True, null=True)
-    close = models.BooleanField(default=False)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_APPROVED, db_index=True)
     author = models.ForeignKey(User, null=True)
     reply = models.DateTimeField(auto_now_add=True)
     pageviews = models.IntegerField(default=0)

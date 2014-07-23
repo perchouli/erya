@@ -22,7 +22,7 @@ def post_list(request, category_id):
     tags = CategoryTag.objects.filter(category=category)
     page_size = 50
 
-    posts = Post.objects.filter(close=False).order_by('-created_at')
+    posts = Post.objects.approved().order_by('-created_at')
 
     paginator = Paginator(posts, page_size)
     page = request.GET.get('page', 1)
@@ -71,7 +71,6 @@ def create(request):
         return HttpResponseRedirect('/posts/%s/' % post.id)
 
 @login_required
-@csrf_exempt
 def reply(request, post_id):
     if request.method == 'POST':
         reply = Reply()
@@ -93,3 +92,21 @@ def reply(request, post_id):
         response['created_at'] = reply.created_at.strftime('%Y-%m-%d %H:%M:%S')
 
         return HttpResponse(json.dumps(response), content_type='application/json')
+
+
+def delete(request):
+    object_id = request.GET.get('object_id')
+    if request.GET.get('type').lower() == 'post':
+        model = Post
+    else:
+        model = Reply
+
+    row = model.objects.get(pk=object_id)
+    response = {}
+    if request.user.id == row.author.id:
+        row.delete()
+        response['status'] = 'ok'
+    else:
+        response['errorMessage'] = u'没有删除权限'
+
+    return HttpResponse(json.dumps(response), content_type='application/json')

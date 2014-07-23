@@ -22,13 +22,10 @@
     <div class="ui segment">
       <a href="#" class="avatar"><img class="ui image avatar" src="{{ post.author.email|gravatar }}" /></a>
       <div class="content">{{ post.content|safe }}</div>
-      <div class="footer">
+      <div class="footer" data-object-id="{{ post.id }}" data-type="post">
         <div class="post-toolbar">
           <ul>
             <li><a href="javascript:void(0)" class="js-reply-post"><i class="reply mail icon"></i>回复</a></li>
-            {% if request.user = post.author or user.is_superuser %}
-            <!-- <li><a href="/post/edit/{{post.id}}/"><i class="edit sign icon"></i>编辑</a></li> -->
-            {% endif %}
           </ul>
         </div>
         <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ post.author }}</a> | {{ post.created_at| date:"Y-m-d H:i:s" }}</div>
@@ -39,14 +36,14 @@
     <div class="ui segment">
       <a href="#" class="avatar"><img class="ui image avatar" src="{{ reply.author.email|gravatar }}" /></a>
       <div class="content">{{ reply.content|safe }}</div>
-      <div class="footer">
+      <div class="footer" data-object-id="{{ reply.id }}" data-type="reply">
         <div class="post-toolbar">
           <ul>
             <li><a href="javascript:void(0)" class="js-reply-post" data-username="{{ reply.author.username }}"><i class="reply mail icon"></i>回复</a></li>
-            {% if request.user = reply.author or user.is_superuser %}<!-- <li><a href="javascript:void(0)"><i class="edit sign icon"></i>编辑</a></li> -->{% endif %}
           </ul>
         </div>
         <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ reply.author }}</a> | {{ reply.created_at| date:"Y-m-d H:i:s" }}</div>
+        <div class="clearfix"></div>
       </div>
     </div>
     {% endfor %}
@@ -82,17 +79,15 @@
 if (location.hash == '#latest') window.scrollTo(0, document.body.scrollHeight);
 
 function renderReply (replyId) {
-
   ajaxWrapper('GET', '/posts/reply/{{ post.id }}/', {'reply_id': replyId}, function (response) {
     var newReply = window.newReply = document.getElementById('post-and-reply').querySelector('.segment').cloneNode(true),
       user = response.user;
     newReply.querySelector('.avatar img').src = response.user.gravatar;
     newReply.querySelector('.content').innerHTML = response.content;
-    newReply.querySelector('.footer .meta').innerHTML = '<a href="/profile/'+ user.id +'/">'+ user.name +'</a> | '+ response.created_at;
+    newReply.querySelector('.footer .meta').innerHTML = '<a href="/profile/'+ user.id +'/">'+ user.username +'</a> | '+ response.created_at;
     document.getElementById('post-and-reply').appendChild(newReply);
     window.scrollTo(0, document.body.scrollHeight);
   });
-
 }
 
 // 点击弹出的modal去除error样式类
@@ -142,6 +137,63 @@ document.getElementById('main').addEventListener('click', function (event) {
     event.preventDefault();
   }
 });
+
+// 鼠标移上显示[删除] (mobile不显示)
+var footers = document.querySelectorAll('.segment .footer');
+for (var i = 0; i < footers.length; i++) {
+  footers[i].addEventListener('mouseenter', addIcons);
+  footers[i].addEventListener('mouseleave', removeIcons);
+}
+function addIcons (event) {
+  var type = event.srcElement.getAttribute('data-type'),
+    objectId = event.srcElement.getAttribute('data-object-id'),
+    removeIcon = document.createElement('li');
+
+  removeIcon.innerHTML = '<a href="javascript:void(0)"><i class="remove sign icon"></i>删除</a>';
+  event.srcElement.querySelector('.post-toolbar ul').appendChild(removeIcon);
+  if (type == 'post') {
+    removeIcon.setAttribute('data-html', '确定要删除主题？ <a class="ui button red tiny" style="width: 3rem;" onclick="removeObject('+ objectId +', \''+ type +'\')">删除</a>');
+    $(removeIcon).popup({ on: 'click', position: 'top right' });
+    return false;
+  }
+  
+  removeIcon.addEventListener('click', function () {
+    removeObject(objectId, type);
+  });
+  // {% if request.user = reply.author or user.is_superuser %}<!-- <li><a href="javascript:void(0)"><i class="edit sign icon"></i>编辑</a></li> -->{% endif %}
+}
+function removeIcons (event) {
+  var icons = event.srcElement.querySelectorAll('.post-toolbar ul li');
+  if (icons.length > 1) icons[0].parentElement.innerHTML = icons[0].outerHTML;
+}
+
+// 删除post(主题)或是reply(回帖)
+function removeObject (objectId, type) {
+  ajaxWrapper('GET', '/posts/delete/', {
+    'object_id': objectId,
+    'type': type
+  }, function (response) {
+    if (response.status != 'ok') {
+      alert(response.errorMessage);
+      return;
+    }
+
+    if (type == 'post') {
+      location.href = '{% url 'category' post.category.id %}';
+      return;
+    }
+    else {
+      var doms = document.querySelectorAll('#post-and-reply .segment .footer');
+      for (var i = 0; i < doms.length; i++) {
+        if (doms[i].getAttribute('data-object-id') != objectId) continue;
+        doms[i].parentElement.style.opacity = 0;
+        sleep(300, function () {
+          doms[i-1].parentElement.remove();
+        });
+      }
+    }
+  });
+}
 
 var images = document.querySelectorAll('#post-and-reply .content img');
 for (var i = 0; i < images.length; i++) {
