@@ -7,7 +7,7 @@
         {% csrf_token %}
         <div class="field">
           <label for="title">标题</label>
-          <input type="text" id="id_title" name="title">
+          <input type="text" id="id_title" name="title" maxlength="48">
           <div class="ui red pointing above ui label" style="display:none;"></div>
         </div>
         {% if not category.id %}
