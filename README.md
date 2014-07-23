@@ -28,5 +28,5 @@ Erya
 
 回到首页，可以开始使用了。
 
-*   演示地址： [http://bbs.dmyz.org](http://bbs.dmyz.or)
+*   演示地址： [http://bbs.dmyz.org](http://bbs.dmyz.org)
 *   Github： [https://github.com/perchouli/erya](https://github.com/perchouli/erya)
