@@ -14,9 +14,9 @@
 </head>
 <body ontouchstart>
   <div id="top-menu" class="ui inverted menu">
-    <a class="logo item" href="/">ERYA</a>
+    <a class="logo item" href="/" title="Logo">ERYA</a>
     {% for category in CATEGORIES %}
-      <a class="item" href="{% url 'category' category.id %}" title="{{ category.name }}"><i class="icon {{ category.icon }}"></i></a>
+      <a class="item item-category" href="{% url 'category' category.id %}" title="{{ category.name }}"><i class="icon {{ category.icon }}"></i></a>
     {% endfor %}
     <div class="section ui dropdown link item">
       <i class="icon block layout"></i>
@@ -52,7 +52,7 @@
 <script src="{{ STATIC_URL }}javascript/main.js"></script>
 <script>
 $('#top-menu .ui.dropdown').dropdown();
-$('#top-menu a.item').popup({
+$('#top-menu a.item-category').popup({
   delay: 50
 });
 </script>

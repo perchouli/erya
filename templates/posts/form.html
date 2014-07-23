@@ -79,7 +79,7 @@ cancelButton.addEventListener('click', function () {
 });
 
 if (typeof(editor) != 'object') window.editor = new Quill('#js-id-post-editor');
-photoIcon.addEventListener('click', function () {
+/*photoIcon.addEventListener('click', function () {
   $('#js-id-input-upload-photo').trigger('click');
 });
 
@@ -88,13 +88,6 @@ photoInput.addEventListener('change', function () {
   $.ajax({
     url: '/ajax/upload/images/', 
     type: 'POST',
-    // xhr: function () { 
-    //   var myXhr = $.ajaxSettings.xhr();
-    //   if(myXhr.upload){
-    //     alert('uploaded');
-    //   }
-    //   return myXhr;
-    // },
     beforeSend: function () {
       $('#js-id-mask').addClass('active');
     },
@@ -108,7 +101,7 @@ photoInput.addEventListener('change', function () {
     contentType: false,
     processData: false
   });
-});
+});*/
 
 function checkPostForm (form) {
   var titleInput = $(form).find('#id_title');

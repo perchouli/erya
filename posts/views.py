@@ -1,3 +1,4 @@
+# coding: utf-8
 from django.core.paginator import Paginator
 from django.db.transaction import commit_on_success
 from django.forms.models import model_to_dict
@@ -13,7 +14,6 @@ from accounts.templatetags.users_tags import gravatar
 
 import random
 import datetime
-import requests
 import json
 
 
@@ -22,7 +22,7 @@ def post_list(request, category_id):
     tags = CategoryTag.objects.filter(category=category)
     page_size = 50
 
-    posts = Post.objects.approved().order_by('-created_at')
+    posts = Post.objects.approved().filter(category=category).order_by('-created_at')
 
     paginator = Paginator(posts, page_size)
     page = request.GET.get('page', 1)
