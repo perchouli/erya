@@ -18,7 +18,7 @@ class Category(models.Model):
         return self.name
 
     def posts(self):
-        return Post.objects.filter(category=self)
+        return Post.objects.approved().filter(category=self).order_by('-created_at')[:3]
 
 class CategoryTag(models.Model):
     COLOR_CHOICES = (
