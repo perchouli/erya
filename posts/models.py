@@ -31,8 +31,8 @@ class CategoryTag(models.Model):
     name = models.CharField(max_length=32)
     category = models.ForeignKey(Category)
     color = models.CharField(max_length=48, choices=COLOR_CHOICES, default='success')
+    sort = models.IntegerField(max_length=8)
     description = models.TextField(blank=True)
-    sort = models.IntegerField(max_length=8, blank=True)
 
     def __unicode__(self):
         return self.name
