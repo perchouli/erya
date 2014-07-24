@@ -1,6 +1,6 @@
   <div class="ui segment">
     <a id="js-id-add-post-button" href="javascript:void(0)" class="ui button green">发布主题</a>
-    <div id="js-id-add-post-form" class="ui form" style="display: none;">
+    <div id="js-id-add-post-form" class="ui form" style="display:none;">
 
       {% if user.is_authenticated %}
       <form id="id_post_form" method="post" action="/posts/create/" onsubmit="return checkPostForm(this);">
@@ -26,16 +26,17 @@
         <input type="hidden" name="category_id" value="{{ category.id }}">
         {% endif %}
 
-        {% if category.id == 4 %}
-        <div class="field">
-          <label for="id_tag">类型</label>
-          <div>
-            {% for tag in category.categorytag_set.all %}
-            <label>
-              <input name="tag" type="radio" value="{{tag.id}}"> {{tag.name}}
-            </label>
-            {% endfor %}
+        {% if category.categorytag_set.count %}
+        <div class="field grouped inline">
+          <label>类型</label>
+          {% for tag in category.categorytag_set.all %}
+          <div class="field">
+            <div class="ui radio checkbox">
+              <input id="id_tag_{{ tag.id }}" name="tag" type="radio" value="{{ tag.id }}">
+              <label for="id_tag_{{ tag.id }}">{{ tag.name }}</label>
+            </div>
           </div>
+          {% endfor %}
         </div>
         {% endif %}
 
@@ -62,6 +63,7 @@
   <div class="ui loader"></div>
 </div>
 <script>
+
 var addPostButton = document.getElementById('js-id-add-post-button'),
   cancelButton = document.getElementById('js-id-cancel-button'),
   addPostForm = document.getElementById('js-id-add-post-form'),
@@ -69,14 +71,18 @@ var addPostButton = document.getElementById('js-id-add-post-button'),
   photoIcon = document.getElementById('js-id-icon-photo'),
   photoInput = document.getElementById('js-id-input-upload-photo');
 
-addPostButton.addEventListener('click', function () {
-  addPostButton.style.display = 'none';
-  addPostForm.style.display = '';
-});
-cancelButton.addEventListener('click', function () {
-  addPostButton.style.display = '';
-  addPostForm.style.display = 'none';
-});
+var postForm = {
+  show: function () {
+    addPostButton.style.display = 'none';
+    addPostForm.style.display = '';
+  },
+  hide: function () {
+    addPostButton.style.display = '';
+    addPostForm.style.display = 'none';
+  }
+}
+addPostButton.addEventListener('click', postForm.show);
+cancelButton.addEventListener('click', postForm.hide);
 
 if (typeof(editor) != 'object') window.editor = new Quill('#js-id-post-editor');
 /*photoIcon.addEventListener('click', function () {

@@ -11,9 +11,12 @@
       <div class="active section">{{ category.name }}</div>
     </div>
   </div>
-  {% if category.description %}
+  {% if category.description or category.categorytag_set.count %}
   <div class="ui segment">
     {{ category.description|safe }}
+    {% for tag in category.categorytag_set.all %}
+      <a class="ui label {{ tag.color }}" href="?tag_id={{ tag.id }}" style="height: 2rem; margin:0px;">{{ tag.name }}</a>
+    {% endfor %}
   </div>
   {% endif %}
 
@@ -24,7 +27,7 @@
     <div class="item">
       <img class="ui avatar image" src="{{ post.author.email|gravatar }}">
       <div class="content">
-        <div class="header"><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></div>
+        <div class="header"><a href="{% url 'post_detail' post.id %}">{{ post.title }} {%if post.tag and not request.GET.tag_id %}<label class="ui label small {{ post.tag.color }}" style="border-radius: 0px;height: 1.5rem; line-height: 1;">{{ post.tag.name }}</label>{% endif %}</a></div>
         <p>{{ post.created_at|date:"Y-m-d H:i:s" }}</p>
       </div>
       <div class="right floated ui grid">
@@ -46,13 +49,13 @@
   <div class="pagination">
     <ul>
       {% if posts.has_previous %}
-      <li><a href="?page={{ posts.previous_page_number }}{%if request.GET.tag%}&tag={{request.GET.tag}}{%endif%}">上一页</a></li>
+      <li><a href="?page={{ posts.previous_page_number }}{%if request.GET.tag_id%}&tag_id={{request.GET.tag_id}}{%endif%}">上一页</a></li>
       {% endif %} 
       {% for i in paginator.page_range %}
-      <li id="page{{i}}" {{request.GET.page }}><a  href="?page={{i}}{%if request.GET.tag%}&tag={{request.GET.tag}}{%endif%}">{{i}}</a> </li>
+      <li id="page{{i}}" {{request.GET.page }}><a  href="?page={{i}}{%if request.GET.tag_id%}&tag_id={{request.GET.tag_id}}{%endif%}">{{i}}</a> </li>
       {% endfor %}
       {% if posts.has_next %}
-      <li><a href="?page={{ posts.next_page_number }}{%if request.GET.tag%}&tag={{request.GET.tag}}{%endif%}">下一页</a></li>
+      <li><a href="?page={{ posts.next_page_number }}{%if request.GET.tag_id%}&tag_id={{request.GET.tag_id}}{%endif%}">下一页</a></li>
       {% endif %}
     </ul>
   </div>

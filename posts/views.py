@@ -23,6 +23,8 @@ def post_list(request, category_id):
     page_size = 50
 
     posts = Post.objects.approved().filter(category=category).order_by('-created_at')
+    if request.GET.get('tag_id'):
+        posts = posts.filter(tag_id=int(request.GET.get('tag_id')))
 
     paginator = Paginator(posts, page_size)
     page = request.GET.get('page', 1)
@@ -69,6 +71,8 @@ def create(request):
         post.save()
 
         return HttpResponseRedirect('/posts/%s/' % post.id)
+    
+    return HttpResponseRedirect('/')
 
 @login_required
 def reply(request, post_id):
@@ -80,7 +84,11 @@ def reply(request, post_id):
         reply.save()
         return HttpResponse(reply.id)
     else:
-        reply_id = int(request.GET.get('reply_id'))
+        try:
+            reply_id = int(request.GET.get('reply_id'))
+        except TypeError:
+            return HttpResponse(json.dumps({'errorMessage': u'获取回复内容失败，reply_id错误'}), content_type='application/json')
+
         reply = Reply.objects.get(pk=reply_id)
         response = model_to_dict(reply)
         user = User.objects.get(pk=reply.author.id)
