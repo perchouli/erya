@@ -6,5 +6,6 @@ urlpatterns = patterns('posts.views',
     url(r'^create/$', 'create'),
     url(r'^delete/$', 'delete'),
     url(r'^reply/(?P<post_id>\d+)/$', 'reply'),
+    url(r'^upload/$', 'upload'),
     # url(r'^edit/(?P<post_id>\d+)/$', 'edit_post'),
 )

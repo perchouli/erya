@@ -48,10 +48,10 @@
 
         <button type="submit" class="ui blue submit button">提交</button><div type="submit" class="ui button" style="margin-left: 20px;" id="js-id-cancel-button">取消</div>
       </form>
-      <!--form enctype="multipart/form-data">
+      <form enctype="multipart/form-data">{% csrf_token %}
         <input id="js-id-input-upload-photo" name="upfile" type="file" accept="image/jpeg,image/jpg,image/png,image/x-png;capture=camera" style="display: none;" />
         <i class="photo icon" id="js-id-icon-photo"></i>
-      </form-->
+      </form>
       {% else %}
       <div class="ui floating message">
         <strong>发布信息前请先<a href="/login/?next=/post/category/{{category.id}}/">登录</a>。</strong> 
@@ -85,20 +85,20 @@ addPostButton.addEventListener('click', postForm.show);
 cancelButton.addEventListener('click', postForm.hide);
 
 if (typeof(editor) != 'object') window.editor = new Quill('#js-id-post-editor');
-/*photoIcon.addEventListener('click', function () {
-  $('#js-id-input-upload-photo').trigger('click');
+photoIcon.addEventListener('click', function () {
+  photoInput.click();
 });
 
 photoInput.addEventListener('change', function () {
   var formData = new FormData($(this).closest('form')[0]);
   $.ajax({
-    url: '/ajax/upload/images/', 
+    url: '/posts/upload/', 
     type: 'POST',
     beforeSend: function () {
       $('#js-id-mask').addClass('active');
     },
     success: function (response) {
-      editor.insertEmbed(editor.getLength(), 'image', '/{{request.user.id}}/' + response + '!main');
+      editor.insertEmbed(editor.getLength(), 'image', response);
       $('#js-id-mask').removeClass('active');
     },
     error: $.noop,
@@ -107,15 +107,16 @@ photoInput.addEventListener('change', function () {
     contentType: false,
     processData: false
   });
-});*/
+});
 
 function checkPostForm (form) {
-  var titleInput = $(form).find('#id_title');
-  if (titleInput.val() == '') {
-    titleInput.closest('.field').addClass('error');
+  var titleInput = document.getElementById('id_title'),
+    contentTextarea = document.getElementById('id_content');
+  if (titleInput.value == '') {
+    titleInput.parentElement.className = 'field error';
     titleInput.focus();
     return false;
   }
-  $('#id_content').val(editor.getHTML());
+  contentTextarea.value = editor.getHTML();
 }
 </script>

@@ -95,3 +95,9 @@ class Reply(models.Model):
 
     def __str__(self):
         return self.post.title
+
+def get_file_path(model, file_name):
+    return '%d/%s' % (model.user.id, file_name)
+class Attachment(models.Model):
+    user = models.ForeignKey(User)
+    src = models.ImageField(upload_to=get_file_path)

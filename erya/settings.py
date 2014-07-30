@@ -107,5 +107,5 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     'erya.context_processors.categories',
 )
-# import sys
-# sys.path.append(os.path.join(BASE_DIR, 'threads', 'templatetags'))
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

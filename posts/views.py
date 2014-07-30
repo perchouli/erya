@@ -9,7 +9,7 @@ from django.template.response import TemplateResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
-from .models import Category, CategoryTag, Post, Reply
+from .models import Category, CategoryTag, Post, Reply, Attachment
 from accounts.templatetags.users_tags import gravatar
 
 import random
@@ -118,3 +118,13 @@ def delete(request):
         response['errorMessage'] = u'没有删除权限'
 
     return HttpResponse(json.dumps(response), content_type='application/json')
+
+def upload(request):
+    today = datetime.datetime.today()
+    upfile = request.FILES.get('upfile', '')
+
+    file_type = str(upfile.name).split('.')[-1].lower()
+    file_name = str(today.strftime("%Y%m%d%H-%f")) + '.' + file_type
+    upfile.name = file_name
+    attachment = Attachment.objects.create(user=request.user, src=upfile)
+    return HttpResponse(attachment.src.url)
