@@ -15,14 +15,14 @@ Erya
 
 下载[zip包](https://github.com/perchouli/erya/archive/master.zip)解压或是直接clone，用pip3安装Django1.7。建议使用Python3运行。
 
-    git clone https://github.com/perchouli/erya.git
+    git clone git@github.com:boronine/pypyenv.git
     cd erya
-    pip3 install -r requirement.txt</div>
+    pip3 install -r requirements.txt</div>
 
 执行migration相关命令，添加管理账号。**如果使用默认的sqlite可以跳过这一步**，默认的管理账号/密码是： **root/root**
 
-    python3 manager.py migrate
-    python3 manager.py createsuperuser
+    python3 manage.py migrate
+    python3 manage.py createsuperuser
 
 进入[管理后台](http://bbs.dmyz.org/admin/)，添加分类，分类icon请参看：　[http://semantic-ui.com/elements/icon.html](http://semantic-ui.com/elements/icon.html)
 
