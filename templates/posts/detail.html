@@ -82,9 +82,15 @@ function renderReply (replyId) {
   ajaxWrapper('GET', '/posts/reply/{{ post.id }}/', {'reply_id': replyId}, function (response) {
     var newReply = window.newReply = document.getElementById('post-and-reply').querySelector('.segment').cloneNode(true),
       user = response.user;
+    newReply.setAttribute('id', 'js-id-reply-' + replyId);
     newReply.querySelector('.avatar img').src = response.user.gravatar;
     newReply.querySelector('.content').innerHTML = response.content;
-    newReply.querySelector('.footer .meta').innerHTML = '<a href="/profile/'+ user.id +'/">'+ user.username +'</a> | '+ response.created_at;
+    var footer = newReply.querySelector('.footer');
+    footer.querySelector('.meta').innerHTML = '<a href="/profile/'+ user.id +'/">'+ user.username +'</a> | '+ response.created_at;
+    footer.setAttribute('data-type', 'reply');
+    footer.setAttribute('data-object-id', replyId);
+    footer.addEventListener('mouseenter', addIcons);
+    footer.addEventListener('mouseleave', removeIcons);
     document.getElementById('post-and-reply').appendChild(newReply);
     window.scrollTo(0, document.body.scrollHeight);
   });
@@ -186,7 +192,7 @@ function removeObject (objectId, type) {
       var reply = document.getElementById('js-id-reply-'+ objectId);
       reply.style.opacity = 0;
       sleep(300, function () {
-        reply.parentElement.remove();
+        reply.remove();
       });
     }
 
