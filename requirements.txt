@@ -1,3 +1,4 @@
 # TODO: remove when django 1.7 released
-https://github.com/django/django/archive/1.7c1.zip
+https://github.com/django/django/archive/1.7c2.zip
 Pillow
+https://github.com/justquick/django-activity-stream/archive/0.5.0.zip
