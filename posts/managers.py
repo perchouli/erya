@@ -20,13 +20,13 @@ class PostManager(Manager):
         return PostQuerySet(self.model, using=self._db)
 
     def approved(self):
-        return self.get_query_set().approved()
+        return self.get_queryset().approved()
 
     def expired(self):
-        return self.get_query_set().expired()
+        return self.get_queryset().expired()
 
     def rejected(self):
-        return self.get_query_set().rejected()
+        return self.get_queryset().rejected()
 
     def removed(self):
-        return self.get_query_set().removed()
+        return self.get_queryset().removed()
