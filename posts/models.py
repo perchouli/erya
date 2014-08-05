@@ -1,9 +1,12 @@
 # encoding: utf8
+from django.apps import AppConfig
 from django.db import models
-
+from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
 from .managers import PostManager
+
+from actstream import registry, action
 
 class Category(models.Model):
     name = models.CharField(max_length=32)
@@ -39,8 +42,6 @@ class CategoryTag(models.Model):
 
     def __str__(self):
         return self.name
-
-
 
 class Post(models.Model):
     STATUS_REVIEW = 'review'
@@ -84,6 +85,7 @@ class Post(models.Model):
     def latest_reply(self):
         return Reply.objects.filter(post=self).latest('created_at')
 
+
 class Reply(models.Model):
     post = models.ForeignKey(Post, related_name='post')
     created_at = models.DateTimeField(auto_now_add=True, editable=True)
@@ -95,6 +97,10 @@ class Reply(models.Model):
 
     def __str__(self):
         return self.post.title
+
+def reply_notice(sender, instance, created, **kwargs):
+    action.send(instance.post.author, verb='receive', action_object=instance, target=instance.post)
+post_save.connect(reply_notice, sender=Reply)
 
 def get_file_path(model, file_name):
     return '%d/%s' % (model.user.id, file_name)
