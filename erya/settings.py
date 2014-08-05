@@ -39,6 +39,7 @@ INSTALLED_APPS = (
 
     'accounts',
     'posts',
+    'actstream',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -106,6 +107,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
 
     'erya.context_processors.categories',
+    'erya.context_processors.actions',
 )
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

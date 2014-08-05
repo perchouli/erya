@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from .models import Category, CategoryTag, Post, Reply, Attachment
 from accounts.templatetags.users_tags import gravatar
 
+from actstream.models import Action
 import random
 import datetime
 import json
@@ -46,6 +47,11 @@ def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     post.pageviews = post.pageviews + 1 # TODO: Use SQL add 1
     post.save()
+
+    # 暂时以修改verb的方式实现清除回帖提醒
+    if request.user == post.author:
+        notices = Action.objects.filter(actor_object_id=request.user.id, verb='receive', target_object_id=post.id)
+        notices.update(verb='read')
 
     ctx = {
         'category': post.category,

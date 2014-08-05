@@ -48,13 +48,26 @@
   </div><!--end footer -->
 <script src="{{ STATIC_URL }}javascript/jquery-1.11.1.min.js"></script>
 <script src="{{ STATIC_URL }}javascript/semantic.min.js"></script>
-<script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="" data-redirecturi="" charset="utf-8"></script>
 <script src="{{ STATIC_URL }}javascript/main.js"></script>
 <script>
 $('#top-menu .ui.dropdown').dropdown();
 $('#top-menu a.item-category').popup({
   delay: 50
 });
+{% if REPLY_NOTIFICATIONS %}
+  var notices = $('<div class="ui small list"></div>');
+
+  {% for notice in REPLY_NOTIFICATIONS %}
+  var notice = $('<div class="item"><i class="mail outline icon"></i><div class="content"><div class="description"></div></div></div>');
+  notice.find('.description').html('<a href="{% url 'profile' notice.action_object.author.id %}">{{ notice.action_object.author }}</a>在<a href="{% url 'post_detail' notice.target.id %}">{{ notice.target.title }}</a>中回复了你');
+  notices.append(notice);
+  {% endfor %}
+
+  $('#top-menu .avatar').popup({
+    'html': notices[0].outerHTML,
+  });
+  $('#top-menu .avatar').popup('show');
+{% endif %}
 </script>
 {% block script %}{% endblock %}
 </body>
