@@ -99,7 +99,8 @@ class Reply(models.Model):
         return self.post.title
 
 def reply_notice(sender, instance, created, **kwargs):
-    action.send(instance.post.author, verb='receive', action_object=instance, target=instance.post)
+    if instance.post.author != instance.author:
+        action.send(instance.post.author, verb='receive', action_object=instance, target=instance.post)
 post_save.connect(reply_notice, sender=Reply)
 
 def get_file_path(model, file_name):
