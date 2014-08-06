@@ -49,8 +49,8 @@ def post_detail(request, post_id):
     post.save()
 
     # 暂时以修改verb的方式实现清除回帖提醒
-    if request.user == post.author:
-        notices = Action.objects.filter(actor_object_id=request.user.id, verb='receive', target_object_id=post.id)
+    if request.user:
+        notices = Action.objects.filter(actor_object_id=request.user.id, target_object_id=post.id).exclude(verb='read')
         notices.update(verb='read')
 
     ctx = {

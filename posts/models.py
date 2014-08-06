@@ -8,6 +8,8 @@ from .managers import PostManager
 
 from actstream import registry, action
 
+import re
+
 class Category(models.Model):
     name = models.CharField(max_length=32)
     sort = models.IntegerField(max_length=8)
@@ -101,6 +103,13 @@ class Reply(models.Model):
 def reply_notice(sender, instance, created, **kwargs):
     if instance.post.author != instance.author:
         action.send(instance.post.author, verb='receive', action_object=instance, target=instance.post)
+
+    at_username = re.search('<span\ style="color:#638911">@(\S+)</span>', instance.content)
+    if at_username:
+        username = at_username.group(1).strip()
+        user = User.objects.get(username=username)
+        if user != instance.author:
+            action.send(user, verb='reminded', action_object=instance, target=instance.post)
 post_save.connect(reply_notice, sender=Reply)
 
 def get_file_path(model, file_name):
