@@ -55,7 +55,7 @@
   <div class="content">
     <div class="ui form">
       <div class="field">
-        <div class="input"><input type="text" value="回复 {{post.title}}" disabled /></div>
+        <div class="input"><input type="text" value="回复 {{ post.title }}" disabled /></div>
       </div>
       <div class="field">
         <div id="js-id-reply-editor"></div>
@@ -87,6 +87,7 @@ function renderReply (replyId) {
     newReply.querySelector('.content').innerHTML = response.content;
     var footer = newReply.querySelector('.footer');
     footer.querySelector('.meta').innerHTML = '<a href="/profile/'+ user.id +'/">'+ user.username +'</a> | '+ response.created_at;
+    footer.querySelector('.js-reply-post').setAttribute('data-username', response.user.username);
     footer.setAttribute('data-type', 'reply');
     footer.setAttribute('data-object-id', replyId);
     footer.addEventListener('mouseenter', addIcons);
@@ -97,9 +98,12 @@ function renderReply (replyId) {
 }
 
 // 点击弹出的modal去除error样式类
-$('#js-id-add-post-modal').on('click', function (e) { $(this).find('.field').removeClass('error'); e.stopPropagation(); e.preventDefault();});
+document.getElementById('js-id-add-post-modal').addEventListener('click', function (event) {
+  var errorField = document.getElementById('js-id-add-post-modal').querySelector('.error');
+  if (errorField) errorField.className = 'field';
+});
 
-// post回复内容到后台
+// 把编辑器的内容写到textarea，然后post提交
 document.getElementById('js-id-add-reply').addEventListener('click', function (event) {
   if (editor.getText().trim() == '') {
     document.getElementById('js-id-reply-editor').parentElement.className = 'field error';
@@ -138,10 +142,9 @@ document.getElementById('main').addEventListener('click', function (event) {
         }
       })
       .modal('show');
-
-    event.stopPropagation();
     event.preventDefault();
   }
+  event.stopPropagation();
 });
 
 // 鼠标移上显示[删除] (mobile不显示)
