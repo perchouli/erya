@@ -143,8 +143,8 @@ document.getElementById('main').addEventListener('click', function (event) {
       })
       .modal('show');
     event.preventDefault();
+    event.stopPropagation();
   }
-  event.stopPropagation();
 });
 
 // 鼠标移上显示[删除] (mobile不显示)
@@ -157,7 +157,7 @@ function addIcons (event) {
   var type = event.srcElement.getAttribute('data-type'),
     objectId = event.srcElement.getAttribute('data-object-id'),
     removeIcon = document.createElement('li');
-
+  if (event.srcElement.querySelector('.meta a').innerText != '{{ request.user.username }}') return; //从右下角的meta信息判断是否为作者
   removeIcon.innerHTML = '<a href="javascript:void(0)"><i class="remove sign icon"></i>删除</a>';
   event.srcElement.querySelector('.post-toolbar ul').appendChild(removeIcon);
   if (type == 'post') {
