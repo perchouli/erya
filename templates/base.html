@@ -54,17 +54,26 @@ $('#top-menu .ui.dropdown').dropdown();
 $('#top-menu a.item-category').popup({
   delay: 50
 });
-{% if REPLY_NOTIFICATIONS %}
-  var notices = $('<div class="ui small list"></div>');
+{% if NOTIFICATIONS %}
+  var notices = document.createElement('div');
+  notices.className = 'ui small list';
 
-  {% for notice in REPLY_NOTIFICATIONS %}
-  var notice = $('<div class="item"><i class="mail outline icon"></i><div class="content"><div class="description"></div></div></div>');
-  notice.find('.description').html('<a href="{% url 'profile' notice.action_object.author.id %}">{{ notice.action_object.author }}</a>在<a href="{% url 'post_detail' notice.target.id %}">{{ notice.target.title }}</a>中回复了你');
-  notices.append(notice);
+  {% for notice in NOTIFICATIONS %}
+  var notice = document.createElement('div'),
+    iconMap = {
+      'receive': 'mail',
+      'reminded': 'email basic'
+    };//未使用。目前只有两种notification，先用if处理
+
+  notice.className = 'item';
+  notice.innerHTML = '<i class="{% if notice.verb == 'receive' %}mail{% else %}email basic{% endif %} outline icon"></i><div class="content"><div class="description">' +
+    '<a href="{% url 'profile' notice.action_object.author.id %}">{{ notice.action_object.author }}</a>在<a href="{% url 'post_detail' notice.target.id %}{% if notice.verb == 'reminded' %}#js-id-reply-{{ notice.action_object.id }}{% endif %}">{{ notice.target.title }}</a>{% if notice.verb == 'receive' %}回复{% else %}提到{% endif %}了你' + 
+    '</div></div></div>';
+  notices.appendChild(notice);
   {% endfor %}
 
   $('#top-menu .avatar').popup({
-    'html': notices[0].outerHTML,
+    'html': notices.outerHTML,
   });
   $('#top-menu .avatar').popup('show');
 {% endif %}

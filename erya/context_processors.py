@@ -6,5 +6,5 @@ def categories(request):
 
 def actions(request):
     return {
-        'REPLY_NOTIFICATIONS': request.user and Action.objects.filter(actor_object_id=request.user.id, verb='receive') or None
+        'NOTIFICATIONS': request.user and Action.objects.filter(actor_object_id=request.user.id).exclude(verb='read') or None
     }

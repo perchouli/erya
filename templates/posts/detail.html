@@ -137,7 +137,7 @@ document.getElementById('main').addEventListener('click', function (event) {
       .modal('setting', {
         onShow: function () {
           window.editor = new Quill('#js-id-reply-editor');
-          if (username) editor.setHTML('<span style="color:#638911" data-username="'+ username +'">@'+ username +'</span>&nbsp;');
+          if (username) editor.setHTML('<span style="color:#638911">@'+ username +'</span>&nbsp;');
           // editor.addModule('toolbar', { container: '#toolbar' });
         }
       })
