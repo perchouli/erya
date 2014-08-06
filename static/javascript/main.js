@@ -2,7 +2,7 @@
 var pointings = document.querySelectorAll('form .ui.pointing');
 for (var i = 0; i < pointings.length; i++) {
   var pointing = pointings[i];
-  if (pointing.innerText != '') {
+  if (pointing.innerHTML != '') {
     pointing.style.display = '';
     pointing.parentElement.className = 'field error';
   }

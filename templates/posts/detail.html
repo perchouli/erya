@@ -125,8 +125,9 @@ document.getElementById('js-id-add-reply').addEventListener('click', function (e
 
 // 弹出[回复]Modal
 document.getElementById('main').addEventListener('click', function (event) {
-  if (event.srcElement.className == 'js-reply-post') {
-    var username = event.srcElement.getAttribute('data-username');
+  var srcElement = event.target || event.srcElement;
+  if (srcElement.className == 'js-reply-post') {
+    var username = srcElement.getAttribute('data-username');
     {% if not user.is_authenticated %}
     alert('请先登陆');
     location.href = '/login/?next=/post/{{post.id}}/'
@@ -154,12 +155,13 @@ for (var i = 0; i < footers.length; i++) {
   footers[i].addEventListener('mouseleave', removeIcons);
 }
 function addIcons (event) {
-  var type = event.srcElement.getAttribute('data-type'),
-    objectId = event.srcElement.getAttribute('data-object-id'),
+  var srcElement = event.target || event.srcElement,
+    type = srcElement.getAttribute('data-type'),
+    objectId = srcElement.getAttribute('data-object-id'),
     removeIcon = document.createElement('li');
-  if (event.srcElement.querySelector('.meta a').innerText != '{{ request.user.username }}') return; //从右下角的meta信息判断是否为作者
+  if (srcElement.querySelector('.meta a').innerText != '{{ request.user.username }}') return; //从右下角的meta信息判断是否为作者
   removeIcon.innerHTML = '<a href="javascript:void(0)"><i class="remove sign icon"></i>删除</a>';
-  event.srcElement.querySelector('.post-toolbar ul').appendChild(removeIcon);
+  srcElement.querySelector('.post-toolbar ul').appendChild(removeIcon);
   if (type == 'post') {
     removeIcon.setAttribute('data-html', '确定要删除主题？ <a class="ui button red tiny" style="width: 3rem;" onclick="removeObject('+ objectId +', \''+ type +'\')">删除</a>');
     $(removeIcon).popup({ on: 'click', position: 'top right' });
@@ -172,7 +174,8 @@ function addIcons (event) {
   // {% if request.user = reply.author or user.is_superuser %}<!-- <li><a href="javascript:void(0)"><i class="edit sign icon"></i>编辑</a></li> -->{% endif %}
 }
 function removeIcons (event) {
-  var icons = event.srcElement.querySelectorAll('.post-toolbar ul li');
+  var srcElement = event.target || event.srcElement,
+    icons = srcElement.querySelectorAll('.post-toolbar ul li');
   if (icons.length > 1) icons[0].parentElement.innerHTML = icons[0].outerHTML;
 }
 
