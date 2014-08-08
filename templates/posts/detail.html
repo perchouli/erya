@@ -50,7 +50,7 @@
   </div>
 </div>
 
-<div class="ui modal" id="js-id-add-post-modal">
+<div class="ui modal" id="js-id-modal">
 <!--   <i class="close icon"></i> -->
   <div class="content">
     <div class="ui form">
@@ -58,8 +58,8 @@
         <div class="input"><input type="text" value="回复 {{ post.title }}" disabled /></div>
       </div>
       <div class="field">
-        <div id="js-id-reply-editor"></div>
-        <form id="jd-id-form-reply">{% csrf_token %}
+        <div id="js-id-modal-editor"></div>
+        <form id="js-id-form-reply">{% csrf_token %}
         <textarea name="content" style="display: none;"></textarea>
         </form>
       </div>
@@ -67,7 +67,7 @@
   </div>
   <div class="buttons">
     <a href="javascript:void(0)" class="ui button green" id="js-id-add-reply">提交</a>
-    <div class="ui button" onclick="$('#js-id-add-post-modal').modal('hide');">取消</div>
+    <div class="ui button" onclick="$('#js-id-modal').modal('hide');">取消</div>
   </div>
 </div>
 {% endblock %}
@@ -98,32 +98,12 @@ function renderReply (replyId) {
 }
 
 // 点击弹出的modal去除error样式类
-document.getElementById('js-id-add-post-modal').addEventListener('click', function (event) {
-  var errorField = document.getElementById('js-id-add-post-modal').querySelector('.error');
+document.getElementById('js-id-modal').addEventListener('click', function (event) {
+  var errorField = document.getElementById('js-id-modal').querySelector('.error');
   if (errorField) errorField.className = 'field';
 });
 
-// 把编辑器的内容写到textarea，然后post提交
-document.getElementById('js-id-add-reply').addEventListener('click', function (event) {
-  if (editor.getText().trim() == '') {
-    document.getElementById('js-id-reply-editor').parentElement.className = 'field error';
-    event.stopPropagation();
-    event.preventDefault();
-    return false;
-  }
-  var form = document.getElementById('jd-id-form-reply');
-  form.querySelector('textarea').innerText = editor.getHTML();
-
-  var data = new FormData(form);
-  ajaxWrapper('POST', '/posts/reply/{{ post.id }}/', data, function (response) {
-    editor.setHTML('<p></p>');
-    $('#js-id-add-post-modal').modal('hide');
-    renderReply(response);
-  });
-});
-
-
-// 弹出[回复]Modal
+// 弹出Modal
 document.getElementById('main').addEventListener('click', function (event) {
   var srcElement = event.target || event.srcElement;
   if (srcElement.className == 'js-reply-post') {
@@ -134,10 +114,10 @@ document.getElementById('main').addEventListener('click', function (event) {
     return false;
     {% endif %}
 
-    $('#js-id-add-post-modal')
+    $('#js-id-modal')
       .modal('setting', {
         onShow: function () {
-          window.editor = new Quill('#js-id-reply-editor');
+          window.editor = new Quill('#js-id-modal-editor');
           if (username) editor.setHTML('<span style="color:#638911">@'+ username +'</span>&nbsp;');
           // editor.addModule('toolbar', { container: '#toolbar' });
         }
@@ -146,6 +126,25 @@ document.getElementById('main').addEventListener('click', function (event) {
     event.preventDefault();
     event.stopPropagation();
   }
+});
+
+// 把编辑器的内容写到textarea，然后post提交
+document.getElementById('js-id-add-reply').addEventListener('click', function (event) {
+  if (editor.getText().trim() == '') {
+    document.getElementById('js-id-modal-editor').parentElement.className = 'field error';
+    event.stopPropagation();
+    event.preventDefault();
+    return false;
+  }
+  var form = document.getElementById('jd-id-form-reply');
+  form.querySelector('textarea').innerText = editor.getHTML();
+
+  var data = new FormData(form);
+  ajaxWrapper('POST', '/posts/reply/{{ post.id }}/', data, function (response) {
+    editor.setHTML('<p></p>');
+    $('#js-id-modal').modal('hide');
+    renderReply(response);
+  });
 });
 
 // 鼠标移上显示[删除] (mobile不显示)
@@ -158,11 +157,14 @@ function addIcons (event) {
   var srcElement = event.target || event.srcElement,
     type = srcElement.getAttribute('data-type'),
     objectId = srcElement.getAttribute('data-object-id'),
-    removeIcon = document.createElement('li');
+    removeIcon = document.createElement('li'),
+    editIcon = document.createElement('li');
   if (srcElement.querySelector('.meta a').innerText != '{{ request.user.username }}') return; //从右下角的meta信息判断是否为作者
   removeIcon.innerHTML = '<a href="javascript:void(0)"><i class="remove sign icon"></i>删除</a>';
+  editIcon.innerHTML = '<a href="javascript:void(0)"><i class="edit sign icon"></i>编辑</a>';
   srcElement.querySelector('.post-toolbar ul').appendChild(removeIcon);
   if (type == 'post') {
+    srcElement.querySelector('.post-toolbar ul').appendChild(editIcon);
     removeIcon.setAttribute('data-html', '确定要删除主题？ <a class="ui button red tiny" style="width: 3rem;" onclick="removeObject('+ objectId +', \''+ type +'\')">删除</a>');
     $(removeIcon).popup({ on: 'click', position: 'top right' });
     return false;
