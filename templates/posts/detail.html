@@ -25,7 +25,7 @@
       <div class="footer" data-object-id="{{ post.id }}" data-type="post">
         <div class="post-toolbar">
           <ul>
-            <li><a href="javascript:void(0)" class="js-reply-post"><i class="reply mail icon"></i>回复</a></li>
+            <li onclick="showModal(event, this)"><a href="javascript:void(0)" class="js-reply-post"><i class="reply mail icon"></i>回复</a></li>
           </ul>
         </div>
         <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ post.author }}</a> | {{ post.created_at| date:"Y-m-d H:i:s" }}</div>
@@ -39,7 +39,7 @@
       <div class="footer" data-object-id="{{ reply.id }}" data-type="reply">
         <div class="post-toolbar">
           <ul>
-            <li><a href="javascript:void(0)" class="js-reply-post" data-username="{{ reply.author.username }}"><i class="reply mail icon"></i>回复</a></li>
+            <li onclick="showModal(event, this)" data-username="{{ reply.author.username }}"><a href="javascript:void(0)" class="js-reply-post"><i class="reply mail icon"></i>回复</a></li>
           </ul>
         </div>
         <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ reply.author }}</a> | {{ reply.created_at| date:"Y-m-d H:i:s" }}</div>
@@ -87,7 +87,7 @@ function renderReply (replyId) {
     newReply.querySelector('.content').innerHTML = response.content;
     var footer = newReply.querySelector('.footer');
     footer.querySelector('.meta').innerHTML = '<a href="/profile/'+ user.id +'/">'+ user.username +'</a> | '+ response.created_at;
-    footer.querySelector('.js-reply-post').setAttribute('data-username', response.user.username);
+    footer.querySelector('.post-toolbar ul li').setAttribute('data-username', response.user.username);
     footer.setAttribute('data-type', 'reply');
     footer.setAttribute('data-object-id', replyId);
     footer.addEventListener('mouseenter', addIcons);
@@ -97,6 +97,27 @@ function renderReply (replyId) {
   });
 }
 
+function showModal (event, element) {
+  var username = element.getAttribute('data-username');
+  {% if not user.is_authenticated %}
+  alert('请先登陆');
+  location.href = '/login/?next=/post/{{post.id}}/'
+  return false;
+  {% endif %}
+
+  $('#js-id-modal')
+    .modal('setting', {
+      onShow: function () {
+        window.editor = new Quill('#js-id-modal-editor');
+        if (username) editor.setHTML('<span style="color:#638911">@'+ username +'</span>&nbsp;');
+        // editor.addModule('toolbar', { container: '#toolbar' });
+      }
+    })
+    .modal('show');
+  event.preventDefault();
+  event.stopPropagation();
+}
+
 // 点击弹出的modal去除error样式类
 document.getElementById('js-id-modal').addEventListener('click', function (event) {
   var errorField = document.getElementById('js-id-modal').querySelector('.error');
@@ -104,29 +125,12 @@ document.getElementById('js-id-modal').addEventListener('click', function (event
 });
 
 // 弹出Modal
-document.getElementById('main').addEventListener('click', function (event) {
+document.getElementById('main').addEventListener('click', function (event, a) {
   var srcElement = event.target || event.srcElement;
   if (srcElement.className == 'js-reply-post') {
-    var username = srcElement.getAttribute('data-username');
-    {% if not user.is_authenticated %}
-    alert('请先登陆');
-    location.href = '/login/?next=/post/{{post.id}}/'
-    return false;
-    {% endif %}
 
-    $('#js-id-modal')
-      .modal('setting', {
-        onShow: function () {
-          window.editor = new Quill('#js-id-modal-editor');
-          if (username) editor.setHTML('<span style="color:#638911">@'+ username +'</span>&nbsp;');
-          // editor.addModule('toolbar', { container: '#toolbar' });
-        }
-      })
-      .modal('show');
-    event.preventDefault();
-    event.stopPropagation();
   }
-});
+}, true);
 
 // 把编辑器的内容写到textarea，然后post提交
 document.getElementById('js-id-add-reply').addEventListener('click', function (event) {
@@ -136,7 +140,7 @@ document.getElementById('js-id-add-reply').addEventListener('click', function (e
     event.preventDefault();
     return false;
   }
-  var form = document.getElementById('jd-id-form-reply');
+  var form = document.getElementById('js-id-form-reply');
   form.querySelector('textarea').innerText = editor.getHTML();
 
   var data = new FormData(form);
