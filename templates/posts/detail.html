@@ -53,17 +53,17 @@
 <div class="ui modal" id="js-id-modal">
 <!--   <i class="close icon"></i> -->
   <div class="content">
+    <form id="js-id-form-reply">{% csrf_token %}
     <div class="ui form">
       <div class="field">
-        <div class="input"><input type="text" value="回复 {{ post.title }}" disabled /></div>
+        <div class="input"><input type="text" name="title" value="回复 {{ post.title }}" disabled /></div>
       </div>
       <div class="field">
         <div id="js-id-modal-editor"></div>
-        <form id="js-id-form-reply">{% csrf_token %}
         <textarea name="content" style="display: none;"></textarea>
-        </form>
       </div>
     </div>
+    </form>
   </div>
   <div class="buttons">
     <a href="javascript:void(0)" class="ui button green" id="js-id-add-reply">提交</a>
@@ -98,7 +98,7 @@ function renderReply (replyId) {
 }
 
 function showModal (event, element) {
-  var username = element.getAttribute('data-username');
+  var username = element ? element.getAttribute('data-username') : false;
   {% if not user.is_authenticated %}
   alert('请先登陆');
   location.href = '/login/?next=/post/{{post.id}}/'
@@ -124,14 +124,6 @@ document.getElementById('js-id-modal').addEventListener('click', function (event
   if (errorField) errorField.className = 'field';
 });
 
-// 弹出Modal
-document.getElementById('main').addEventListener('click', function (event, a) {
-  var srcElement = event.target || event.srcElement;
-  if (srcElement.className == 'js-reply-post') {
-
-  }
-}, true);
-
 // 把编辑器的内容写到textarea，然后post提交
 document.getElementById('js-id-add-reply').addEventListener('click', function (event) {
   if (editor.getText().trim() == '') {
@@ -141,7 +133,7 @@ document.getElementById('js-id-add-reply').addEventListener('click', function (e
     return false;
   }
   var form = document.getElementById('js-id-form-reply');
-  form.querySelector('textarea').innerText = editor.getHTML();
+  form.querySelector('textarea').innerHTML = editor.getHTML();
 
   var data = new FormData(form);
   ajaxWrapper('POST', '/posts/reply/{{ post.id }}/', data, function (response) {
@@ -163,12 +155,17 @@ function addIcons (event) {
     objectId = srcElement.getAttribute('data-object-id'),
     removeIcon = document.createElement('li'),
     editIcon = document.createElement('li');
-  if (srcElement.querySelector('.meta a').innerText != '{{ request.user.username }}') return; //从右下角的meta信息判断是否为作者
+  if (srcElement.querySelector('.meta a').innerHTML != '{{ request.user.username }}') return; //从右下角的meta信息判断是否为作者
   removeIcon.innerHTML = '<a href="javascript:void(0)"><i class="remove sign icon"></i>删除</a>';
   editIcon.innerHTML = '<a href="javascript:void(0)"><i class="edit sign icon"></i>编辑</a>';
   srcElement.querySelector('.post-toolbar ul').appendChild(removeIcon);
   if (type == 'post') {
+    {% if request.user == post.author %}
     srcElement.querySelector('.post-toolbar ul').appendChild(editIcon);
+    editIcon.addEventListener('click', function (event) {
+      showModal(event);
+    });
+    {% endif %}
     removeIcon.setAttribute('data-html', '确定要删除主题？ <a class="ui button red tiny" style="width: 3rem;" onclick="removeObject('+ objectId +', \''+ type +'\')">删除</a>');
     $(removeIcon).popup({ on: 'click', position: 'top right' });
     return false;
@@ -177,7 +174,6 @@ function addIcons (event) {
   removeIcon.addEventListener('click', function () {
     removeObject(objectId, type);
   });
-  // {% if request.user = reply.author or user.is_superuser %}<!-- <li><a href="javascript:void(0)"><i class="edit sign icon"></i>编辑</a></li> -->{% endif %}
 }
 function removeIcons (event) {
   var srcElement = event.target || event.srcElement,
