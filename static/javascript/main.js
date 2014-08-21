@@ -60,3 +60,27 @@ function sleep (millis, callback) {
     callback();
   }, millis);
 }
+
+var IM = {};
+IM.ws = new WebSocket('ws://echo.websocket.org');
+IM.ws.onopen = function (e) {
+  console.log(IM.ws.protocol);
+  IM.ws.send('init');
+};
+IM.ws.onmessage = function (e) {
+  if (typeof e.data === 'string') {
+    console.log('String"', e, e.data);
+  }
+  else
+    console.log(e, e.data)
+};
+IM.ws.onerror = function (e) {
+  console.log('WebSocket Error: ', e);
+};
+
+IM.sendMessage = function (message) {
+  var ws = this.ws;
+  if (ws.readyState) {
+    ws.send(message);
+  }
+};
