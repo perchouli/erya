@@ -78,8 +78,8 @@
 <script>
 if (location.hash == '#latest') window.scrollTo(0, document.body.scrollHeight);
 
-function renderReply (replyId) {
-  ajaxWrapper('GET', '/posts/reply/{{ post.id }}/', {'reply_id': replyId}, function (response) {
+function renderReply(replyId) {
+  ajaxWrapper('GET', '{% url 'reply_post' post.id %}', {'reply_id': replyId}, function (response) {
     var newReply = window.newReply = document.getElementById('post-and-reply').querySelector('.segment').cloneNode(true),
       user = response.user;
     newReply.setAttribute('id', 'js-id-reply-' + replyId);
@@ -97,7 +97,7 @@ function renderReply (replyId) {
   });
 }
 
-function showModal (event, element, isEdit) {
+function showModal(event, element, isEdit) {
   var username = element ? element.getAttribute('data-username') : null;
   {% if not user.is_authenticated %}
   alert('请先登陆');
@@ -120,7 +120,7 @@ function showModal (event, element, isEdit) {
           saveBtn.setAttribute('data-action', 'edit');
         }
         else { 
-          titleInput.value = '回复 ' + titleInput.value;
+          titleInput.value = '回复 ' + '{{ post.title }}';
           titleInput.setAttribute('disabled', 'disabled');
           saveBtn.setAttribute('data-action', 'reply');
           if (username) editor.setHTML('<span style="color:#638911">@'+ username +'</span>&nbsp;');
@@ -164,7 +164,7 @@ for (var i = 0; i < footers.length; i++) {
   footers[i].addEventListener('mouseenter', addIcons);
   footers[i].addEventListener('mouseleave', removeIcons);
 }
-function addIcons (event) {
+function addIcons(event) {
   var srcElement = event.target || event.srcElement,
     type = srcElement.getAttribute('data-type'),
     objectId = srcElement.getAttribute('data-object-id'),
@@ -190,14 +190,14 @@ function addIcons (event) {
     removeObject(objectId, type);
   });
 }
-function removeIcons (event) {
+function removeIcons(event) {
   var srcElement = event.target || event.srcElement,
     icons = srcElement.querySelectorAll('.post-toolbar ul li');
   if (icons.length > 1) icons[0].parentElement.innerHTML = icons[0].outerHTML;
 }
 
 // 删除post(主题)或是reply(回帖)
-function removeObject (objectId, type) {
+function removeObject(objectId, type) {
   ajaxWrapper('GET', '/posts/delete/', {
     'object_id': objectId,
     'type': type
