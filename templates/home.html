@@ -19,7 +19,7 @@
               {% for post in category.posts %}
               <div class="post-preview">
                 <a href="{% url 'profile' post.author.id %}" title="{{ post.author.username }}" style="float:left;"><img class="ui image avatar" src="{{ post.author.email|gravatar }}" /></a>
-                <h4 class="post-title"><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h4>
+                <h4 class="post-title"><a href="{% url 'post_detail' post.id %}" title="{{ post.title }}">{{ post.title }}</a></h4>
                 <div class="post-content">{{ post.content|removetags:'p div img br'|substring:200|safe }}</div>
                 <div class="meta">{{ post.created_at|date:"Y-m-d H:i:s" }} | <a href="{% url 'post_detail' post.id %}">阅读全文</a></div>
                 <div class="clearfix"></div>
