@@ -21,7 +21,7 @@
   <div id="post-and-reply">
     <div class="ui segment">
       <a href="#" class="avatar"><img class="ui image avatar" src="{{ post.author.email|gravatar }}" /></a>
-      <div class="content">{{ post.content|safe }}</div>
+      <div class="content">{{ post.content|removetags:"script"|safe }}</div>
       <div class="footer" data-object-id="{{ post.id }}" data-type="post">
         <div class="post-toolbar">
           <ul>
@@ -35,7 +35,7 @@
     {% for reply in post_replies %}
     <div class="ui segment" id="js-id-reply-{{ reply.id }}">
       <a href="#" class="avatar"><img class="ui image avatar" src="{{ reply.author.email|gravatar }}" /></a>
-      <div class="content">{{ reply.content|safe }}</div>
+      <div class="content">{{ reply.content|removetags:"script"|safe }}</div>
       <div class="footer" data-object-id="{{ reply.id }}" data-type="reply">
         <div class="post-toolbar">
           <ul>
