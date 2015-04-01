@@ -9,7 +9,7 @@ Erya
 
 在界面上模仿NodeBB，前端使用SemanticUI，支持自适应，编辑器使用[Quilljs](http://quilljs.com/)，同样也是支持自适应的：
 
-因为是面向国内中文用户，所以没有Google的JS/字体API等容易被墙掉的性能，用户头像是使用Gravatar的，因为目前Gravatar可以正常访问。
+因为是面向国内中文用户，所以没有Google的JS/字体API等容易被墙掉的性能。
 
 ## 安装
 
