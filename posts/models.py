@@ -27,11 +27,11 @@ class Category(models.Model):
 
 class CategoryTag(models.Model):
     COLOR_CHOICES = (
-        ('red', u'红色'),
-        ('blue', u'蓝色'),
-        ('green', u'绿色'),
-        ('purpel', u'紫色'),
-        ('black', u'黑色'),
+        ('red', '红色'),
+        ('blue', '蓝色'),
+        ('green', '绿色'),
+        ('purpel', '紫色'),
+        ('black', '黑色'),
     )
     name = models.CharField(max_length=32)
     category = models.ForeignKey(Category)
@@ -53,11 +53,11 @@ class Post(models.Model):
     STATUS_EXPIRED = 'expired'
 
     STATUS_CHOICES = (
-        (STATUS_REVIEW, u'待审核'),
-        (STATUS_APPROVED, u'已发布'),
-        (STATUS_REJECTED, u'已拒绝'),
-        (STATUS_REMOVED, u'已删除'),
-        (STATUS_EXPIRED, u'已过期'),
+        (STATUS_REVIEW, '待审核'),
+        (STATUS_APPROVED, '已发布'),
+        (STATUS_REJECTED, '已拒绝'),
+        (STATUS_REMOVED, '已删除'),
+        (STATUS_EXPIRED, '已过期'),
     )
     objects = PostManager()
     title = models.CharField(max_length=48)
