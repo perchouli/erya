@@ -1,3 +1,3 @@
-Django
+Django==1.7.7
 Pillow
-https://github.com/justquick/django-activity-stream/archive/0.5.0.zip
+django-activity-stream==0.5.1
