@@ -92,7 +92,7 @@ def reply(request, post_id):
         try:
             reply_id = int(request.GET.get('reply_id'))
         except TypeError:
-            return HttpResponse(json.dumps({'errorMessage': u'获取回复内容失败，reply_id错误'}), content_type='application/json')
+            return HttpResponse(json.dumps({'errorMessage': '获取回复内容失败，reply_id错误'}), content_type='application/json')
 
         reply = Reply.objects.get(pk=reply_id)
         response = model_to_dict(reply)
@@ -130,7 +130,7 @@ def reply(request, post_id):
         try:
             reply_id = int(request.GET.get('reply_id'))
         except TypeError:
-            return HttpResponse(json.dumps({'errorMessage': u'获取回复内容失败，reply_id错误'}), content_type='application/json')
+            return HttpResponse(json.dumps({'errorMessage': '获取回复内容失败，reply_id错误'}), content_type='application/json')
 
         reply = Reply.objects.get(pk=reply_id)
         response = model_to_dict(reply)
@@ -158,7 +158,7 @@ def delete(request):
         row.delete()
         response['status'] = 'ok'
     else:
-        response['errorMessage'] = u'没有删除权限'
+        response['errorMessage'] = '没有删除权限'
 
     return HttpResponse(json.dumps(response), content_type='application/json')
 
