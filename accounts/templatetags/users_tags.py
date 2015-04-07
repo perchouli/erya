@@ -8,4 +8,4 @@ register = template.Library()
 
 @register.filter
 def gravatar(value):
-    return 'http://www.gravatar.com/avatar/' + hashlib.md5(value.encode('utf-8').lower()).hexdigest()
+    return 'http://gravatar.duoshuo.com/avatar/' + hashlib.md5(value.encode('utf-8').lower()).hexdigest()
