@@ -11,6 +11,11 @@ Erya
 
 因为是面向国内中文用户，所以没有Google的JS/字体API等容易被墙掉的性能。
 
+## 更新
+
+### 2015.04.23
+更新Django到1.8，更新SemanticUI到1.12。
+
 ## 安装
 
 下载[zip包](https://github.com/perchouli/erya/archive/master.zip)解压或是直接clone，用pip3安装Django1.7。建议使用Python3运行。

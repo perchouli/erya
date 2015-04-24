@@ -1,7 +1,6 @@
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
-from django.db.transaction import commit_on_success
 from django.template.response import TemplateResponse
 
 from posts.models import Post, Reply
@@ -9,7 +8,6 @@ from posts.models import Post, Reply
 from .forms import RegistrationForm
 from .models import UserProfile
 
-# @commit_on_success
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)

@@ -1,22 +1,20 @@
-{% load string_filter users_tags %}
+{% load staticfiles string_filter users_tags %}
 <!DOCTYPE HTML>
 <html lang="zh-cn">
 </head>
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/x-icon" href="{{ STATIC_URL }}favicon.ico"  /> 
-  <link rel="shortcut icon" href="{{ STATIC_URL }}favicon.ico" type="image/x-icon" />
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}"  /> 
+  <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon" />
   <title>{% block title %}{% endblock %} - Erya</title>
-  <link href="{{ STATIC_URL }}css/semantic.min.css" rel="stylesheet">
-  <link href="{{ STATIC_URL }}css/style.less" rel="stylesheet/less" type="text/css">
-  <script src="{{ STATIC_URL }}javascript/less-1.7.3.min.js"></script>
+  <link href="{% static 'css/semantic.min.css' %}" rel="stylesheet">
   <script src="http://dmyz.org/quill/quill.min.js"></script>
 </head>
 <body ontouchstart>
-  <div id="top-menu" class="ui inverted menu">
+  <div id="top-menu" class="ui secondary pointing menu">
     <a class="logo item" href="/" title="Logo">ERYA</a>
     {% for category in CATEGORIES %}
-      <a class="item item-category" href="{% url 'category' category.id %}" title="{{ category.name }}"><i class="icon {{ category.icon }}"></i></a>
+      <a class="item item-category" href="{% url 'category' category.id %}" title="{{ category.name }}"><i class="icon help {{ category.icon }}"></i></a>
     {% endfor %}
     <div class="section ui dropdown link item">
       <i class="icon block layout"></i>
@@ -31,7 +29,9 @@
     </div>
     <div class="right menu">
       {% if user.is_authenticated %}
-      <a class="item" href="{% url 'profile' request.user.id %}"><img class="ui avatar image" src="{{ request.user.email|gravatar }}"/></a>
+      <a class="item" href="{% url 'profile' request.user.id %}" style="padding-top: 4px;border:0;">
+        <img class="ui avatar image" src="{{ request.user.email|gravatar }}" style="height:25px; width: 25px;"/>
+      </a>
       <a class="item" href="{% url 'profile' request.user.id %}">{{ request.user.username }}</a>
       <a class="item" href="{% url 'django.contrib.auth.views.logout' %}">退出</a>
       {% else %}
@@ -40,15 +40,16 @@
       {% endif %}
     </div>
   </div>
+
 {% block content %}{% endblock %}
 
   <div class="clearfix"></div>
-  <div id="footer">
+  <div style="text-align: center;">
     <div>&copy;&nbsp;Copyright 2014 <a href="http://dmyz.org">Perchouli</a></div>
   </div><!--end footer -->
-<script src="{{ STATIC_URL }}javascript/jquery-1.11.1.min.js"></script>
-<script src="{{ STATIC_URL }}javascript/semantic.min.js"></script>
-<script src="{{ STATIC_URL }}javascript/main.js"></script>
+<script src="{% static 'javascript/jquery-2.1.3.min.js' %}"></script>
+<script src="{% static 'javascript/semantic.min.js' %}"></script>
+<script src="{% static 'javascript/main.js' %}"></script>
 <script>
 $('#top-menu .ui.dropdown').dropdown();
 $('#top-menu a.item-category').popup({

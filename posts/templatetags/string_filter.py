@@ -3,6 +3,7 @@ from django import template
 from django.template.defaultfilters import stringfilter
 
 import hashlib
+import bleach
 
 register = template.Library()
 
@@ -19,3 +20,9 @@ def substring(value, arg):
         return value[0:length] + '...'
 substring.is_safe = True
 substring = stringfilter(substring)
+
+@register.filter
+def filter_xss(value):
+    tags = ['a', 'p', 'em', 'strong']
+    cleaned_text = bleach.clean(value, tags, strip=True)
+    return cleaned_text

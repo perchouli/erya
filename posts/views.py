@@ -8,7 +8,7 @@ from django.template.response import TemplateResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
-from .models import Category, CategoryTag, Post, Reply, Attachment
+from .models import Category, CategoryTag, Post, Reply
 from accounts.templatetags.users_tags import gravatar
 
 from actstream.models import Action

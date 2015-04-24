@@ -54,7 +54,7 @@
       </form>
       {% else %}
       <div class="ui floating message">
-        <strong>发布信息前请先<a href="/login/?next=/post/category/{{category.id}}/">登录</a>。</strong> 
+        <strong>发布信息前请先<a href="{% url 'login' %}">登录</a>。</strong> 
       </div>
       {% endif %}
     </div>

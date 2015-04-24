@@ -12,7 +12,7 @@ import re
 
 class Category(models.Model):
     name = models.CharField(max_length=32)
-    sort = models.IntegerField(max_length=8)
+    sort = models.IntegerField()
     icon = models.CharField(max_length=16, blank=True)
     description = models.TextField(blank=True)
 
@@ -22,8 +22,8 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-    def posts(self):
-        return Post.objects.approved().filter(category=self).order_by('-created_at')[:3]
+    def latest_post(self):
+        return Post.objects.approved().filter(category=self).latest('created_at')
 
 class CategoryTag(models.Model):
     COLOR_CHOICES = (
@@ -36,7 +36,7 @@ class CategoryTag(models.Model):
     name = models.CharField(max_length=32)
     category = models.ForeignKey(Category)
     color = models.CharField(max_length=48, choices=COLOR_CHOICES, default='success')
-    sort = models.IntegerField(max_length=8)
+    sort = models.IntegerField()
     description = models.TextField(blank=True)
 
     def __unicode__(self):
@@ -116,4 +116,4 @@ def get_file_path(model, file_name):
     return '%d/%s' % (model.user.id, file_name)
 class Attachment(models.Model):
     user = models.ForeignKey(User)
-    src = models.ImageField(upload_to=get_file_path)
+    src = models.FileField(upload_to=get_file_path)
