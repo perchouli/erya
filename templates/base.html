@@ -8,9 +8,10 @@
   <link rel="shortcut icon" href="{% static 'favicon.ico' %}" type="image/x-icon" />
   <title>{% block title %}{% endblock %} - Erya</title>
   <link href="{% static 'css/semantic.min.css' %}" rel="stylesheet">
+  <style type="text/css">#erya .container{ margin: 0 auto; padding: .5% 5% 2% 5%;}</style>
   <script src="http://dmyz.org/quill/quill.min.js"></script>
 </head>
-<body ontouchstart>
+<body id="erya">
   <div id="top-menu" class="ui secondary pointing menu">
     <a class="logo item" href="/" title="Logo">ERYA</a>
     {% for category in CATEGORIES %}
@@ -43,7 +44,6 @@
 
 {% block content %}{% endblock %}
 
-  <div class="clearfix"></div>
   <div style="text-align: center;">
     <div>&copy;&nbsp;Copyright 2014 <a href="http://dmyz.org">Perchouli</a></div>
   </div><!--end footer -->
