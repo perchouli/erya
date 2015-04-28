@@ -9,6 +9,8 @@ from .forms import RegistrationForm
 from .models import UserProfile
 
 def register(request):
+    if request.user.is_authenticated():
+        return redirect('home')
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
@@ -23,7 +25,7 @@ def register(request):
 
             user = authenticate(username=username, password=password)
             login(request, user)
-            return redirect('/')
+            return redirect('home')
     else:
         form = RegistrationForm()
 

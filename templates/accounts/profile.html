@@ -3,8 +3,8 @@
 {% block title %}{{master.username}}的个人主页{% endblock %}
 
 {% block content %}
-<div id="main">
-  <div class="two doubling column ui grid" id="profile">
+<div class="container">
+  <div>
     <div class="column">
       <div class="ui segment" style="text-align:center;">
         <div id="profile-avatar">
@@ -43,7 +43,7 @@
         <div class="posts">
           {% for post in recent_posts %}
           <div class="post-preview">
-            <a href="/post/{{post.id}}/">{{post.title}}</a>
+            <a href="{% url 'post_detail' post.id %}">{{post.title}}</a>
             <small>{{post.created_at|date:"Y-m-d"}}</small>
           </div>
           {% endfor %}

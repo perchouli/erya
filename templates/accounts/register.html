@@ -1,15 +1,12 @@
 {% extends "base.html"  %}
-{% load string_filter %}
 {% block title %}注册{% endblock %}
 
 {% block content %}
-<div id="main">
-  <div class="ui segment">
-    <div class="ui breadcrumb">
-      <a class="section" href="/">首页</a>
-      <div class="divider"> / </div>
-      <div class="active section">注册</div>
-    </div>
+<div class="container">
+  <div class="ui breadcrumb">
+    <a class="section" href="/">首页</a>
+    <div class="divider"> / </div>
+    <div class="active section">注册</div>
   </div>
 
   <div class="two column doubling ui grid">
@@ -19,22 +16,22 @@
           {% csrf_token %}
           <div class="field">
             <label for="id_username">用户名</label>
-            {{form.username}}
+            <div class="ui left icon input">{{form.username}}</div>
             <div class="ui red pointing above ui label" style="display:none;">{{form.username.errors}}</div>
           </div>
           <div class="field">
             <label for="id_password">密码</label>
-            {{form.password}}
+            <div class="ui left icon input">{{form.password}}</div>
             <div class="ui red pointing above ui label" style="display:none;">{{form.password.errors}}</div>
           </div>
           <div class="field">
             <label for="id_confirm_password">确认密码</label>
-            {{form.confirm_password}}
+            <div class="ui left icon input">{{form.confirm_password}}</div>
             <div class="ui red pointing above ui label" style="display:none;">{{form.confirm_password.errors}}</div>
           </div>
           <div class="field">
             <label for="id_email">E-mail</label>
-            {{form.email}}
+            <div class="ui left icon input">{{form.email}}</div>
             <div class="ui red pointing above ui label" style="display:none;">{{form.email.errors}}</div>
           </div>
           <button class="ui button green" type="submit">注册</button>
