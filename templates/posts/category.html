@@ -3,13 +3,11 @@
 {% block title %}{{ category.name }}{% endblock %}
 
 {% block content %}
-<div id="main">
-  <div class="ui segment">
-    <div class="ui breadcrumb">
-      <a class="section" href="/">首页</a>
-      <div class="divider"> / </div>
-      <div class="active section">{{ category.name }}</div>
-    </div>
+<div class="container">
+  <div class="ui breadcrumb">
+    <a class="section" href="/">首页</a>
+    <div class="divider"> / </div>
+    <div class="active section">{{ category.name }}</div>
   </div>
   {% if category.description or category.categorytag_set.count %}
   <div class="ui segment">
@@ -31,31 +29,30 @@
         <p>{{ post.created_at|date:"Y-m-d H:i:s" }}</p>
       </div>
       <div class="right floated ui grid">
-        <div class="eight wide column computer only numbers">
+        <div class="eight wide column computer only">
           <div><strong class="number">{{ post.count.reply }}</strong>回帖数</div>
           <div><strong class="number">{{ post.pageviews }}</strong>阅读数</div>
         </div>
-        {% if post.latest_reply %}
         <div class="eight wide column computer only" style="line-height: 2.5;">
+          {% if post.latest_reply %}
           <a href="{% url 'profile' post.latest_reply.author.id %}" class="reply-avatar" title="{{ post.latest_reply.author.username }}"><img class="ui image avatar" src="{{ post.latest_reply.author.email|gravatar }}" /></a>
           <a href="{% url 'post_detail' post.id %}#latest">{{post.latest_reply.created_at|date:"Y-m-d H:i:s"}}</a>
+          {% endif %}
         </div>
-        {% endif %}
       </div>
     </div>
     {% endfor %}
   </div>
 
-  <div class="pagination">
-    <ul>
+  <div class="ui pagination menu">
       {% if posts.has_previous %}
-      <li><a href="?page={{ posts.previous_page_number }}{%if request.GET.tag_id%}&tag_id={{request.GET.tag_id}}{%endif%}">上一页</a></li>
+      <a href="?page={{ posts.previous_page_number }}{%if request.GET.tag_id%}&tag_id={{request.GET.tag_id}}{%endif%}" class="icon item"><i class="left arrow icon"></i></a>
       {% endif %} 
       {% for i in paginator.page_range %}
-      <li id="page{{i}}" {{request.GET.page }}><a  href="?page={{i}}{%if request.GET.tag_id%}&tag_id={{request.GET.tag_id}}{%endif%}">{{i}}</a> </li>
+      <a href="?page={{i}}{%if request.GET.tag_id%}&tag_id={{request.GET.tag_id}}{%endif%}" class="active item">{{i}} </a>
       {% endfor %}
       {% if posts.has_next %}
-      <li><a href="?page={{ posts.next_page_number }}{%if request.GET.tag_id%}&tag_id={{request.GET.tag_id}}{%endif%}">下一页</a></li>
+      <a href="?page={{ posts.next_page_number }}{%if request.GET.tag_id%}&tag_id={{request.GET.tag_id}}{%endif%}" class="icon item"><i class="right arrow icon"></i></a>
       {% endif %}
     </ul>
   </div>
