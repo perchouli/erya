@@ -36,7 +36,7 @@
         <div class="eight wide column computer only" style="line-height: 2.5;">
           {% if post.latest_reply %}
           <a href="{% url 'profile' post.latest_reply.author.id %}" class="reply-avatar" title="{{ post.latest_reply.author.username }}"><img class="ui image avatar" src="{{ post.latest_reply.author.email|gravatar }}" /></a>
-          <a href="{% url 'post_detail' post.id %}#latest">{{post.latest_reply.created_at|date:"Y-m-d H:i:s"}}</a>
+          <a href="{% url 'post_detail' post.id %}#latest">{{post.latest_reply.created_at|timesince}}</a>
           {% endif %}
         </div>
       </div>
