@@ -4,7 +4,7 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(error_messages={'required': '用户名不能为空'}, max_length=30)

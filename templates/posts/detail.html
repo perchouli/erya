@@ -7,15 +7,13 @@
 .ui.modal>.content {padding: .7em;}
 .ui.modal>.buttons {text-align: right; padding: 1rem 1rem;}
 </style>
-<div id="main">
-  <div class="ui segment">
-    <div class="ui breadcrumb">
-      <a class="section" href="/">首页</a>
-      <div class="divider"> / </div>
-      <a class="section" href="{% url 'category' post.category.id %}">{{post.category.name}}</a>
-      <div class="divider"> / </div>
-      <div class="active section">{{post.title}}</div>
-    </div>
+<div class="container">
+  <div class="ui breadcrumb">
+    <a class="section" href="/">首页</a>
+    <div class="divider"> / </div>
+    <a class="section" href="{% url 'category' post.category.id %}">{{post.category.name}}</a>
+    <div class="divider"> / </div>
+    <div class="active section">{{post.title}}</div>
   </div>
   
   <div id="post-and-reply">
@@ -28,7 +26,7 @@
             <li onclick="showModal(event, this)"><a href="javascript:void(0)" class="js-reply-post"><i class="reply mail icon"></i>回复</a></li>
           </ul>
         </div>
-        <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ post.author }}</a> | {{ post.created_at| date:"Y-m-d H:i:s" }}</div>
+        <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ post.author }}</a> | {{ post.created_at|timesince }}</div>
       </div>
     </div>
 
@@ -42,7 +40,7 @@
             <li onclick="showModal(event, this)" data-username="{{ reply.author.username }}"><a href="javascript:void(0)" class="js-reply-post"><i class="reply mail icon"></i>回复</a></li>
           </ul>
         </div>
-        <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ reply.author }}</a> | {{ reply.created_at| date:"Y-m-d H:i:s" }}</div>
+        <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ reply.author }}</a> | {{ reply.created_at|timesince }}</div>
         <div class="clearfix"></div>
       </div>
     </div>
@@ -101,7 +99,7 @@ function showModal(event, element, isEdit) {
   var username = element ? element.getAttribute('data-username') : null;
   {% if not user.is_authenticated %}
   alert('请先登陆');
-  location.href = '/login/?next=/post/{{post.id}}/'
+  location.href = '{% url 'login' %}?next={{ request.path }}'
   return false;
   {% endif %}
 
