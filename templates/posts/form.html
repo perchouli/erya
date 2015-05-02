@@ -42,7 +42,7 @@
 
         <div class="field">
           <label for="id_content">内容</label>
-          <div id="js-id-post-editor"></div>
+          <div id="id-post-editor" style="border: 1px solid #ddd; border-radius: 5px;"></div>
           <textarea id="id_content" name="content" style="display: none;"></textarea>
         </div>
 
@@ -53,8 +53,8 @@
         <i class="photo icon" id="js-id-icon-photo"></i>
       </form>
       {% else %}
-      <div class="ui floating message">
-        <strong>发布信息前请先<a href="{% url 'login' %}">登录</a>。</strong> 
+      <div class="ui floating">
+        <strong>发布信息前请先<a href="{% url 'login' %}?next={{ request.path }}">登录</a>。</strong> 
       </div>
       {% endif %}
     </div>
@@ -84,7 +84,7 @@ var postForm = {
 addPostButton.addEventListener('click', postForm.show);
 cancelButton.addEventListener('click', postForm.hide);
 
-if (typeof(editor) != 'object') window.editor = new Quill('#js-id-post-editor');
+if (typeof(editor) != 'object') window.editor = new Quill('#id-post-editor');
 photoIcon.addEventListener('click', function () {
   photoInput.click();
 });
