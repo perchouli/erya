@@ -20,24 +20,18 @@
 
   {% include 'posts/form.html' %}  
 
-  <div class="ui divided list segment" id="post-list">
+  <div class="ui divided list segment">
     {% for post in posts.object_list %}
     <div class="item">
       <img class="ui avatar image" src="{{ post.author.email|gravatar }}">
       <div class="content">
         <div class="header"><a href="{% url 'post_detail' post.id %}">{{ post.title }} {%if post.tag and not request.GET.tag_id %}<label class="ui label small {{ post.tag.color }}" style="border-radius: 0px;height: 1.5rem; line-height: 1;">{{ post.tag.name }}</label>{% endif %}</a></div>
-        <p>{{ post.created_at|date:"Y-m-d H:i:s" }}</p>
+        <p>{{ post.created_at|timesince }} by <strong>{{ post.author.username }}</strong></p>
       </div>
-      <div class="right floated ui grid">
-        <div class="eight wide column computer only">
-          <div><strong class="number">{{ post.count.reply }}</strong>回帖数</div>
-          <div><strong class="number">{{ post.pageviews }}</strong>阅读数</div>
-        </div>
-        <div class="eight wide column computer only" style="line-height: 2.5;">
-          {% if post.latest_reply %}
-          <a href="{% url 'profile' post.latest_reply.author.id %}" class="reply-avatar" title="{{ post.latest_reply.author.username }}"><img class="ui image avatar" src="{{ post.latest_reply.author.email|gravatar }}" /></a>
-          <a href="{% url 'post_detail' post.id %}#latest">{{post.latest_reply.created_at|timesince}}</a>
-          {% endif %}
+      <div class="right floated ui grid computer only">
+        <div class=" wide column">
+          <strong>{{ post.count.reply }}</strong>回帖数 <br/>
+          <strong>{{ post.pageviews }}</strong>阅读数
         </div>
       </div>
     </div>
