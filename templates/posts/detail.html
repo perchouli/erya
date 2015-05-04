@@ -73,6 +73,7 @@
 <script>
 if (location.hash == '#latest') window.scrollTo(0, document.body.scrollHeight);
 
+{% if user.is_authenticated %}
 function renderReply(replyId) {
   ajaxWrapper('GET', '{% url 'reply_post' post.id %}', {'reply_id': replyId}, function (response) {
     var newReply = window.newReply = document.getElementById('post-and-reply').querySelector('.segment').cloneNode(true),
@@ -85,6 +86,7 @@ function renderReply(replyId) {
     window.scrollTo(0, document.body.scrollHeight);
   });
 }
+{% endif %}
 
 function showModal(event, element, isEdit) {
   var username = element ? element.getAttribute('data-username') : null;
