@@ -5,7 +5,10 @@
 {% block content %}
 <style>
 .ui.modal>.content {padding: .7em;}
-.ui.modal>.buttons {text-align: right; padding: 1rem 1rem;}
+#post-and-reply .content {padding-left: 50px; min-height: 80px;}
+#post-and-reply .content .meta {line-height: 2; margin-bottom: 15px;}
+#post-and-reply .content .meta .icon {font-size: 4px; vertical-align: middle;margin-left: 5px; margin-right: 0;}
+#post-and-reply .avatar{float: left; }
 </style>
 <div class="container">
   <div class="ui breadcrumb">
@@ -18,30 +21,24 @@
   
   <div id="post-and-reply">
     <div class="ui segment">
-      <a href="#" class="avatar"><img class="ui image avatar" src="{{ post.author.email|gravatar }}" /></a>
-      <div class="content">{{ post.content|removetags:"script"|safe }}</div>
-      <div class="footer" data-object-id="{{ post.id }}" data-type="post">
-        <div class="post-toolbar">
-          <ul>
-            <li onclick="showModal(event, this)"><a href="javascript:void(0)" class="js-reply-post"><i class="reply mail icon"></i>回复</a></li>
-          </ul>
+      <a href="#" class="avatar">
+        <img class="ui image avatar" src="{{ post.author.email|gravatar }}" />
+      </a>
+      <div class="content">
+        <div class="meta">
+          <a href="{% url 'profile' post.author.id %}">{{ post.author }}</a> 发表于 {{ post.created_at|timesince }}
+          <a href="javascript:void(0)" onclick="showModal(event, this)" class="js-reply-post"><i class="icon circle"></i>回复</a>{% if request.user == post.author %}<a href="javascript:void(0)"><i class="icon circle"></i>删除</a>{% endif %}
         </div>
-        <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ post.author }}</a> | {{ post.created_at|timesince }}</div>
+        {{ post.content|removetags:"script"|safe }}
       </div>
     </div>
 
     {% for reply in post_replies %}
     <div class="ui segment" id="js-id-reply-{{ reply.id }}">
       <a href="#" class="avatar"><img class="ui image avatar" src="{{ reply.author.email|gravatar }}" /></a>
-      <div class="content">{{ reply.content|removetags:"script"|safe }}</div>
-      <div class="footer" data-object-id="{{ reply.id }}" data-type="reply">
-        <div class="post-toolbar">
-          <ul>
-            <li onclick="showModal(event, this)" data-username="{{ reply.author.username }}"><a href="javascript:void(0)" class="js-reply-post"><i class="reply mail icon"></i>回复</a></li>
-          </ul>
-        </div>
-        <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ reply.author }}</a> | {{ reply.created_at|timesince }}</div>
-        <div class="clearfix"></div>
+      <div class="content">
+        <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ reply.author }}</a> {{ reply.created_at|timesince }}<a href="javascript:void(0)" onclick="showModal(event, this)" data-username="{{ reply.author.username }}" class="js-reply-post"><i class="icon circle"></i>回复</a></div>
+        {{ reply.content|removetags:"script"|safe }}
       </div>
     </div>
     {% endfor %}
@@ -57,13 +54,13 @@
         <div class="input"><input type="text" name="title" value="{{ post.title }}" /></div>
       </div>
       <div class="field">
-        <div id="js-id-modal-editor"></div>
+        <div id="js-id-modal-editor" style="border: 1px solid #eee; border-radius: 5px;"></div>
         <textarea name="content" style="display: none;"></textarea>
       </div>
     </div>
     </form>
   </div>
-  <div class="buttons">
+  <div class="actions">
     <a href="javascript:void(0)" class="ui button green" id="js-id-btn-save">提交</a>
     <div class="ui button" onclick="$('#js-id-modal').modal('hide');">取消</div>
   </div>
@@ -156,12 +153,6 @@ document.getElementById('js-id-btn-save').addEventListener('click', function (ev
   });
 });
 
-// 鼠标移上显示[删除] (mobile不显示)
-var footers = document.querySelectorAll('.segment .footer');
-for (var i = 0; i < footers.length; i++) {
-  footers[i].addEventListener('mouseenter', addIcons);
-  footers[i].addEventListener('mouseleave', removeIcons);
-}
 function addIcons(event) {
   var srcElement = event.target || event.srcElement,
     type = srcElement.getAttribute('data-type'),
@@ -188,11 +179,7 @@ function addIcons(event) {
     removeObject(objectId, type);
   });
 }
-function removeIcons(event) {
-  var srcElement = event.target || event.srcElement,
-    icons = srcElement.querySelectorAll('.post-toolbar ul li');
-  if (icons.length > 1) icons[0].parentElement.innerHTML = icons[0].outerHTML;
-}
+
 
 // 删除post(主题)或是reply(回帖)
 function removeObject(objectId, type) {
