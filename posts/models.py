@@ -25,6 +25,9 @@ class Category(models.Model):
     def latest_post(self):
         return Post.objects.approved().filter(category=self).latest('created_at')
 
+    def num_posts(self):
+        return Post.objects.filter(category=self).count()
+
 class CategoryTag(models.Model):
     COLOR_CHOICES = (
         ('red', '红色'),

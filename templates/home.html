@@ -38,10 +38,12 @@
 }
 #ey-home .ey-category .ey-stats {
   text-align: center;
+  line-height: 1.8;
   color: #999;
 }
 
 #ey-home .ey-category .ey-number {
+  text-align: center;
   font-size: 22px;
   color: #333;
 }
@@ -64,19 +66,13 @@
     <div class="item ey-category">
       <div class="right floated ey-latest-post">
         <p>
-          <strong class="ey-name">{{ category.latest_post.author }}</strong><a class="ey-time" href="{% url 'post_detail' category.latest_post.id %}">{{ category.latest_post.created_at|timesince }} ago</a>
+          <strong class="ey-name">{{ category.latest_post.author }}</strong><a class="ey-time" href="{% url 'post_detail' category.latest_post.id %}">{{ category.latest_post.created_at|timesince }}</a>
         </p>
         <div class="ey-post-content">{{ category.latest_post.content|safe|filter_xss }}</div>
       </div>
-      <div class="right floated ui grid">
-        <div class="eight wide column ey-stats">
-          <span class="ey-number">123</span><br/>
-          TOPICS
-        </div>
-        <div class="eight wide column ey-stats">
-          <span class="ey-number">123</span><br/>
-          POSTS
-        </div>
+      <div class="right floated ey-stats">
+        <span class="ey-number">{{ category.num_posts }}</span>
+        <p>POSTS</p>
       </div>
       <span class="ui image ey-category-icon"><i class="icon {{ category.icon }}" href="{% url 'category' category.id %}"></i></span>
       <div class="content">

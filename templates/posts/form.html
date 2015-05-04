@@ -50,7 +50,7 @@
       </form>
       <form enctype="multipart/form-data">{% csrf_token %}
         <input id="js-id-input-upload-photo" name="upfile" type="file" accept="image/jpeg,image/jpg,image/png,image/x-png;capture=camera" style="display: none;" />
-        <i class="photo icon" id="js-id-icon-photo"></i>
+        <i class="photo icon" id="js-id-icon-photo" style="position: absolute;bottom: 60px;cursor: pointer; font-size: 40px;margin-top: -70px;"></i>
       </form>
       {% else %}
       <div class="ui floating">
