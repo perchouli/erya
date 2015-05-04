@@ -79,14 +79,8 @@ function renderReply(replyId) {
       user = response.user;
     newReply.setAttribute('id', 'js-id-reply-' + replyId);
     newReply.querySelector('.avatar img').src = response.user.gravatar;
-    newReply.querySelector('.content').innerHTML = response.content;
-    var footer = newReply.querySelector('.footer');
-    footer.querySelector('.meta').innerHTML = '<a href="/profile/'+ user.id +'/">'+ user.username +'</a> | '+ response.created_at;
-    footer.querySelector('.post-toolbar ul li').setAttribute('data-username', response.user.username);
-    footer.setAttribute('data-type', 'reply');
-    footer.setAttribute('data-object-id', replyId);
-    footer.addEventListener('mouseenter', addIcons);
-    footer.addEventListener('mouseleave', removeIcons);
+    newReply.querySelector('.content').innerHTML = '<div class="meta"><a href="{% url 'profile' request.user.id %}">'+response.user.username+'</a></div>' + response.content;
+
     document.getElementById('post-and-reply').appendChild(newReply);
     window.scrollTo(0, document.body.scrollHeight);
   });
@@ -159,7 +153,7 @@ function addIcons(event) {
     objectId = srcElement.getAttribute('data-object-id'),
     removeIcon = document.createElement('li'),
     editIcon = document.createElement('li');
-  if (srcElement.querySelector('.meta a').innerHTML != '{{ request.user.username }}') return; //从右下角的meta信息判断是否为作者
+
   removeIcon.innerHTML = '<a href="javascript:void(0)"><i class="remove sign icon"></i>删除</a>';
   editIcon.innerHTML = '<a href="javascript:void(0)"><i class="edit sign icon"></i>编辑</a>';
   srcElement.querySelector('.post-toolbar ul').appendChild(removeIcon);

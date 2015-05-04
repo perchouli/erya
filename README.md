@@ -5,7 +5,7 @@ Erya
 
 ![erya](http://dmyz.org/wp-content/uploads/2014/07/erya.jpg)
 
-系统的后端是简单的发布主题/回复/评论的功能，目前是基于Django(Python)的。使用Python3.2 + Django1.7的架构，Python2.7测试通过。
+系统的后端是简单的发布主题/回复/评论的功能，目前是基于Django(Python)的。使用Python3 + Django的架构，Python2.7测试通过。
 
 在界面上模仿NodeBB，前端使用SemanticUI，支持自适应，编辑器使用[Quilljs](http://quilljs.com/)，同样也是支持自适应的：
 
@@ -13,12 +13,16 @@ Erya
 
 ## 更新
 
-### 2015.04.23
-更新Django到1.8，更新SemanticUI到1.12。
+### 2015.05.05
+
+* 更新Django到1.8，更新SemanticUI到1.12。
+* 用bleach过滤标签。
+* 首页样式布局调整。
+
 
 ## 安装
 
-下载[zip包](https://github.com/perchouli/erya/archive/master.zip)解压或是直接clone，用pip3安装Django1.7。建议使用Python3运行。
+下载[zip包](https://github.com/perchouli/erya/archive/master.zip)解压或是直接clone，用pip3安装Django。建议使用Python3运行。
 
     git clone https://github.com/perchouli/erya.git
     cd erya
@@ -29,7 +33,7 @@ Erya
     python3 manage.py migrate
     python3 manage.py createsuperuser
 
-进入[管理后台](http://bbs.dmyz.org/admin/)，添加分类，分类icon请参看：　[http://semantic-ui.com/elements/icon.html](http://semantic-ui.com/elements/icon.html)
+进入[管理后台(/admin)](http://bbs.dmyz.org/admin/)，添加分类，分类icon请参看：　[http://semantic-ui.com/elements/icon.html](http://semantic-ui.com/elements/icon.html)
 
 回到首页，可以开始使用了。
 

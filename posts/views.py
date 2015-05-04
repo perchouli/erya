@@ -8,7 +8,7 @@ from django.template.response import TemplateResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 
-from .models import Category, CategoryTag, Post, Reply
+from .models import Category, CategoryTag, Post, Reply, Attachment
 from accounts.templatetags.users_tags import gravatar
 
 from actstream.models import Action
@@ -168,6 +168,7 @@ def upload(request):
 
     file_type = str(upfile.name).split('.')[-1].lower()
     file_name = str(today.strftime("%Y%m%d%H-%f")) + '.' + file_type
+    print file_name
     upfile.name = file_name
     attachment = Attachment.objects.create(user=request.user, src=upfile)
     return HttpResponse(attachment.src.url)
