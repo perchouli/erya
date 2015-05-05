@@ -20,14 +20,14 @@
   </div>
   
   <div id="post-and-reply">
-    <div class="ui segment">
+    <div class="ui segment" id="js-id-post-{{ post.id }}">
       <a href="#" class="avatar">
         <img class="ui image avatar" src="{{ post.author.email|gravatar }}" />
       </a>
       <div class="content">
         <div class="meta">
           <a href="{% url 'profile' post.author.id %}">{{ post.author }}</a> 发表于 {{ post.created_at|timesince }}
-          <a href="javascript:void(0)" onclick="showModal(event, this)" class="js-reply-post"><i class="icon circle"></i>回复</a>{% if request.user == post.author %}<a href="javascript:void(0)"><i class="icon circle"></i>删除</a>{% endif %}
+          <a href="javascript:void(0)" onclick="showModal(event, this)" class="js-reply-post"><i class="icon circle"></i>回复</a>{% if request.user == post.author %}<a href="javascript:void(0)" class="delete"><i class="icon circle"></i>删除</a>{% endif %}
         </div>
         {{ post.content|removetags:"script"|safe }}
       </div>
@@ -149,36 +149,9 @@ document.getElementById('js-id-btn-save').addEventListener('click', function (ev
   });
 });
 
-function addIcons(event) {
-  var srcElement = event.target || event.srcElement,
-    type = srcElement.getAttribute('data-type'),
-    objectId = srcElement.getAttribute('data-object-id'),
-    removeIcon = document.createElement('li'),
-    editIcon = document.createElement('li');
-
-  removeIcon.innerHTML = '<a href="javascript:void(0)"><i class="remove sign icon"></i>删除</a>';
-  editIcon.innerHTML = '<a href="javascript:void(0)"><i class="edit sign icon"></i>编辑</a>';
-  srcElement.querySelector('.post-toolbar ul').appendChild(removeIcon);
-  if (type == 'post') {
-    {% if request.user == post.author %}
-    srcElement.querySelector('.post-toolbar ul').appendChild(editIcon);
-    editIcon.addEventListener('click', function (event) {
-      showModal(event, srcElement, true);
-    });
-    {% endif %}
-    removeIcon.setAttribute('data-html', '确定要删除主题？ <a class="ui button red tiny" style="width: 3rem;" onclick="removeObject('+ objectId +', \''+ type +'\')">删除</a>');
-    $(removeIcon).popup({ on: 'click', position: 'top right' });
-    return false;
-  }
-  
-  removeIcon.addEventListener('click', function () {
-    removeObject(objectId, type);
-  });
-}
-
-
 // 删除post(主题)或是reply(回帖)
 function removeObject(objectId, type) {
+  if (!objectId || !type) return false;
   ajaxWrapper('GET', '/posts/delete/', {
     'object_id': objectId,
     'type': type
@@ -203,10 +176,24 @@ function removeObject(objectId, type) {
   });
 }
 
+
 var images = document.querySelectorAll('#post-and-reply .content img');
 for (var i = 0; i < images.length; i++) {
   images[i].className = 'ui image';
 }
+$('#post-and-reply .meta a.delete').popup({
+  on: 'click',
+  html  : '确定要删除？<button class=\'ui button red tiny button-delete\'>删除</button>',
+  onCreate: function (a) {
+    var _self = this;
+    $('.button-delete').on('click', function () {
+      var id = $(a).closest('.segment').attr('id').replace('js-id-', '').split('-');
+      if (id.length == 2)
+        removeObject(id[1], id[0]);
+      _self.popup('hide');
+    });
+  }
+});
 
 </script>
 {% endblock %}

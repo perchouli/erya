@@ -17,8 +17,7 @@ Erya
 
 * 更新Django到1.8，更新SemanticUI到1.12。
 * 用bleach过滤标签。
-* 首页样式布局调整。
-
+* 首页样式布局调整，旧版下载地址： https://github.com/perchouli/erya/tree/archive
 
 ## 安装
 

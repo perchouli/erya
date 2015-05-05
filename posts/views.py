@@ -44,7 +44,7 @@ def post_list(request, category_id):
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
-    post.pageviews = post.pageviews + 1 # TODO: Use SQL add 1
+    post.pageviews = post.pageviews + 1
     post.save()
 
     # 暂时以修改verb的方式实现清除回帖提醒
@@ -78,33 +78,6 @@ def create(request):
         return HttpResponseRedirect('/posts/%s/' % post.id)
     
     return HttpResponseRedirect('/')
-
-@login_required
-def reply(request, post_id):
-    if request.method == 'POST':
-        reply = Reply()
-        reply.post = Post.objects.get(pk=post_id)
-        reply.author = request.user
-        reply.content = request.POST.get('content')
-        reply.save()
-        return HttpResponse(reply.id)
-    else:
-        try:
-            reply_id = int(request.GET.get('reply_id'))
-        except TypeError:
-            return HttpResponse(json.dumps({'errorMessage': '获取回复内容失败，reply_id错误'}), content_type='application/json')
-
-        reply = Reply.objects.get(pk=reply_id)
-        response = model_to_dict(reply)
-        user = User.objects.get(pk=reply.author.id)
-        response['user'] = {
-            'username': user.username,
-            'id': user.id,
-            'gravatar': gravatar(user.email),
-        }
-        response['created_at'] = reply.created_at.strftime('%Y-%m-%d %H:%M:%S')
-
-        return HttpResponse(json.dumps(response), content_type='application/json')
 
 @login_required
 def edit(request, post_id):
