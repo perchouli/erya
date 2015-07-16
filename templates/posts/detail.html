@@ -3,15 +3,8 @@
 {% block title %}{{post.title}}{% endblock %}
 
 {% block content %}
-<style>
-.ui.modal>.content {padding: .7em;}
-#post-and-reply .content {padding-left: 50px; min-height: 80px;}
-#post-and-reply .content .meta {line-height: 2; margin-bottom: 15px;}
-#post-and-reply .content .meta .icon {font-size: 4px; vertical-align: middle;margin-left: 5px; margin-right: 0;}
-#post-and-reply .avatar{float: left; }
-</style>
 <div class="container">
-  <div class="ui breadcrumb">
+  <div class="ui huge breadcrumb">
     <a class="section" href="/">首页</a>
     <div class="divider"> / </div>
     <a class="section" href="{% url 'category' post.category.id %}">{{post.category.name}}</a>
@@ -21,27 +14,69 @@
   
   <div id="post-and-reply">
     <div class="ui segment" id="js-id-post-{{ post.id }}">
-      <a href="#" class="avatar">
-        <img class="ui image avatar" src="{{ post.author.email|gravatar }}" />
-      </a>
-      <div class="content">
-        <div class="meta">
-          <a href="{% url 'profile' post.author.id %}">{{ post.author }}</a> 发表于 {{ post.created_at|timesince }}
-          <a href="javascript:void(0)" onclick="showModal(event, this)" class="js-reply-post"><i class="icon circle"></i>回复</a>{% if request.user == post.author %}<a href="javascript:void(0)" class="delete"><i class="icon circle"></i>删除</a>{% endif %}
+      <div class="ui grid stackable">
+        <div class="eight wide column">
+          <div class="card">
+            <div class="content">
+              <img class="floated mini ui image" src="{{ post.author.email|gravatar }}">
+              <div class="header"><a href="{% url 'profile' post.author.id %}">{{ post.author }}</a></div>
+              <div class="meta">发表于 {{ post.created_at|timesince }} <a href="javascript:void(0)" onclick="showModal(event, this)" class="js-reply-post"><i class="icon circle"></i>回复</a>{% if request.user == post.author %}<a href="javascript:void(0)" class="delete"><i class="icon circle"></i>删除</a>{% endif %}</div>
+            </div>
+          </div>
         </div>
+        <div class="eight wide column">
+          <div class="ui tiny statistics">
+            <div class="statistic">
+              <div class="value">
+                22
+              </div>
+              <div class="label">
+                Replies
+              </div>
+            </div>
+            <div class="statistic">
+              <div class="value">
+                31,200
+              </div>
+              <div class="label">
+                Views
+              </div>
+            </div>
+            <div class="statistic">
+              <div class="value">
+                0
+              </div>
+              <div class="label">
+                Like
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ui horizontal divider">Text</div>
+      <div class="content">
         {{ post.content|removetags:"script"|safe }}
       </div>
     </div>
 
-    {% for reply in post_replies %}
-    <div class="ui segment" id="js-id-reply-{{ reply.id }}">
-      <a href="#" class="avatar"><img class="ui image avatar" src="{{ reply.author.email|gravatar }}" /></a>
-      <div class="content">
-        <div class="meta"><a href="{% url 'profile' post.author.id %}">{{ reply.author }}</a> {{ reply.created_at|timesince }}<a href="javascript:void(0)" onclick="showModal(event, this)" data-username="{{ reply.author.username }}" class="js-reply-post"><i class="icon circle"></i>回复</a></div>
-        {{ reply.content|removetags:"script"|safe }}
+    <div class="ui segment">
+      {% for reply in post_replies %}
+      <div class="ui comments">
+        <div class="comment" id="js-id-reply-{{ reply.id }}">
+          <a href="{% url 'profile' post.author.id %}" class="avatar"><img class="ui image avatar" src="{{ reply.author.email|gravatar }}" ></a>
+          <div class="content">
+            <a class="author">{{ reply.author }}</a>
+            <div class="metadata"><div class="date">{{ reply.created_at|timesince }}</div></div>
+            <div class="text">{{ reply.content|removetags:"script"|safe }}</div>
+            <div class="actions">
+              <a href="javascript:void(0)" onclick="showModal(event, this)" data-username="{{ reply.author.username }}" class="js-reply-post" class="reply js-reply-post">回复</a>
+              <!-- <a class="edit">编辑</a> -->
+            </div>
+          </div>
+        </div>
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
 </div>
 
@@ -72,128 +107,6 @@
 
 <script>
 if (location.hash == '#latest') window.scrollTo(0, document.body.scrollHeight);
-
-{% if user.is_authenticated %}
-function renderReply(replyId) {
-  ajaxWrapper('GET', '{% url 'reply_post' post.id %}', {'reply_id': replyId}, function (response) {
-    var newReply = window.newReply = document.getElementById('post-and-reply').querySelector('.segment').cloneNode(true),
-      user = response.user;
-    newReply.setAttribute('id', 'js-id-reply-' + replyId);
-    newReply.querySelector('.avatar img').src = response.user.gravatar;
-    newReply.querySelector('.content').innerHTML = '<div class="meta"><a href="{% url 'profile' request.user.id %}">'+response.user.username+'</a></div>' + response.content;
-
-    document.getElementById('post-and-reply').appendChild(newReply);
-    window.scrollTo(0, document.body.scrollHeight);
-  });
-}
-{% endif %}
-
-function showModal(event, element, isEdit) {
-  var username = element ? element.getAttribute('data-username') : null;
-  {% if not user.is_authenticated %}
-  alert('请先登陆');
-  location.href = '{% url 'login' %}?next={{ request.path }}'
-  return false;
-  {% endif %}
-
-  $('#js-id-modal')
-    .modal('setting', {
-      onShow: function () {
-        window.editor = new Quill('#js-id-modal-editor'),
-          titleInput = document.querySelector('#js-id-form input[name="title"]'),
-          saveBtn = document.getElementById('js-id-btn-save')
-
-        if (isEdit) {
-          titleInput.value = '{{ post.title }}';
-          titleInput.removeAttribute('disabled');
-          editor.setHTML('{{ post.content|safe }}');
-
-          saveBtn.setAttribute('data-action', 'edit');
-        }
-        else { 
-          titleInput.value = '回复 ' + '{{ post.title }}';
-          titleInput.setAttribute('disabled', 'disabled');
-          saveBtn.setAttribute('data-action', 'reply');
-          if (username) editor.setHTML('<span style="color:#638911">@'+ username +'</span>&nbsp;');
-        }
-        // editor.addModule('toolbar', { container: '#toolbar' });
-      }
-    })
-    .modal('show');
-  event.preventDefault();
-  event.stopPropagation();
-}
-
-// 点击弹出的modal去除error样式类
-document.getElementById('js-id-modal').addEventListener('click', function (event) {
-  var errorField = document.getElementById('js-id-modal').querySelector('.error');
-  if (errorField) errorField.className = 'field';
-});
-
-// 把编辑器的内容写到textarea，然后post提交
-document.getElementById('js-id-btn-save').addEventListener('click', function (event) {
-  if (editor.getText().trim() == '') {
-    document.getElementById('js-id-modal-editor').parentElement.className = 'field error';
-    event.stopPropagation();
-    event.preventDefault();
-    return false;
-  }
-  var form = document.getElementById('js-id-form');
-  form.querySelector('textarea').innerHTML = editor.getHTML();
-  var data = new FormData(form),
-    action = this.getAttribute('data-action');
-    url = (action == 'edit') ? '{% url 'edit_post' post.id %}' : '{% url 'reply_post' post.id %}';
-  ajaxWrapper('POST', url, data, function (response) {
-    $('#js-id-modal').modal('hide');
-    (action == 'edit') ? location.reload() : renderReply(response);
-  });
-});
-
-// 删除post(主题)或是reply(回帖)
-function removeObject(objectId, type) {
-  if (!objectId || !type) return false;
-  ajaxWrapper('GET', '/posts/delete/', {
-    'object_id': objectId,
-    'type': type
-  }, function (response) {
-    if (response.status != 'ok') {
-      alert(response.errorMessage);
-      return;
-    }
-
-    if (type == 'post') {
-      location.href = '{% url 'category' post.category.id %}';
-      return;
-    }
-    else {
-      var reply = document.getElementById('js-id-reply-'+ objectId);
-      reply.style.opacity = 0;
-      sleep(300, function () {
-        reply.remove();
-      });
-    }
-
-  });
-}
-
-
-var images = document.querySelectorAll('#post-and-reply .content img');
-for (var i = 0; i < images.length; i++) {
-  images[i].className = 'ui image';
-}
-$('#post-and-reply .meta a.delete').popup({
-  on: 'click',
-  html  : '确定要删除？<button class=\'ui button red tiny button-delete\'>删除</button>',
-  onCreate: function (a) {
-    var _self = this;
-    $('.button-delete').on('click', function () {
-      var id = $(a).closest('.segment').attr('id').replace('js-id-', '').split('-');
-      if (id.length == 2)
-        removeObject(id[1], id[0]);
-      _self.popup('hide');
-    });
-  }
-});
 
 </script>
 {% endblock %}

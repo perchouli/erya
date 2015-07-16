@@ -3,83 +3,30 @@
 {% block title %}首页{% endblock %}
 
 {% block content %}
-<style type="text/css">
-#ey-home .ey-category {
-  margin: 10px 0px;
-  padding-top: 10px;
-}
-#ey-home .ey-latest-post {
-  padding-left: 15px;
-  width: 20%;
-  line-height: 0;
-  height: 70px;
-  border-left: 5px solid #333;
-}
-#ey-home .ey-category .ey-category-icon
-{
-  margin-right: 10px;
-  background: #000;
-  border-radius: 60%;
-  padding: 20px;
-  font-size: 22px;
-  color: #fff;
-}
-#ey-home .ey-category .header {
-  font-size: 22px;
-  margin-bottom: 10px;
-}
-#ey-home .ey-category .description {
-  font-size: 18px;
-}
-#ey-home .ey-category .content {
-  margin-left: 25px;
-  padding-left: 15px;
-  
-}
-#ey-home .ey-category .ey-stats {
-  text-align: center;
-  line-height: 1.8;
-  color: #999;
-}
-
-#ey-home .ey-category .ey-number {
-  text-align: center;
-  font-size: 22px;
-  color: #333;
-}
-#ey-home .ey-category .ey-time {
-  color: #999 !important;
-  margin-left: 5px;
-  text-decoration: underline;
-  font-size: 12px;
-}
-
-@media screen and (min-width: 0px) and (max-width: 720px) {
-  #ey-home .ey-category-icon { display: none; }
-  #ey-home .ey-category .right {display: none;}
-}
-</style>
-
-<div id="ey-home" class="container">
-  <div class="ui divided list">
+<div class="container">
+  <div class="ui cards">
     {% for category in CATEGORIES %}
-    <div class="item ey-category">
-      <div class="right floated ey-latest-post">
-        <p>
-          <strong class="ey-name">{{ category.latest_post.author }}</strong><a class="ey-time" href="{% url 'post_detail' category.latest_post.id %}">{{ category.latest_post.created_at|timesince }}</a>
-        </p>
-        <div class="ey-post-content">{{ category.latest_post.content|safe|filter_xss }}</div>
+      <div class="card">
+        <div class="image">
+          <a href="{% url 'category' category.id %}"><i class="icon {{ category.icon }}" style="font-size: 240px; line-height: 1;"></i></a>
+        </div>
+        <div class="content">
+          <div class="header"><a href="{% url 'category' category.id %}">{{ category.name }}</a></div>
+          <div class="meta">
+            <a href="{% url 'post_detail' category.latest_post.id %}">{{ category.num_posts }} Posts</a>
+          </div>
+          <div class="description">{{ category.description|safe }}</div>
+        </div>
+        <div class="extra content">
+          <span class="right floated">
+            <a href="{% url 'post_detail' category.latest_post.id %}">{{ category.latest_post.created_at|timesince }}</a>
+          </span>
+          <span>
+            <i class="user icon"></i>
+            {{ category.latest_post.author }}
+          </span>
+        </div>
       </div>
-      <div class="right floated ey-stats">
-        <span class="ey-number">{{ category.num_posts }}</span>
-        <p>POSTS</p>
-      </div>
-      <span class="ui image ey-category-icon"><i class="icon {{ category.icon }}" href="{% url 'category' category.id %}"></i></span>
-      <div class="content">
-        <a class="header" href="{% url 'category' category.id %}">{{ category.name }}</a>
-        <div class="description">{{ category.description|safe }}</div>
-      </div>
-    </div>
     {% endfor %}
   </div>
 </div>
