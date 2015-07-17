@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
+from django.utils import timesince
 
 from .models import Category, CategoryTag, Post, Reply, Attachment
 from accounts.templatetags.users_tags import gravatar
@@ -15,7 +16,7 @@ from actstream.models import Action
 import random
 import datetime
 import json
-
+import bleach
 
 def post_list(request, category_id):
     category = Category.objects.get(pk=category_id)
@@ -47,16 +48,28 @@ def post_detail(request, post_id):
     post.pageviews = post.pageviews + 1
     post.save()
 
+    replies = Reply.objects.filter(post=post)
+
     # 暂时以修改verb的方式实现清除回帖提醒
     if request.user:
         notices = Action.objects.filter(actor_object_id=request.user.id, target_object_id=post.id).exclude(verb='read')
         notices.update(verb='read')
 
+    if request.is_ajax():
+        response = []
+        for reply in replies:
+            data = model_to_dict(reply)
+            data['user'] = _serialize_user(data['author'])
+            data['content'] = bleach.clean(data['content'], ['a',], strip=True)
+            data['created_at'] = timesince.timesince(reply.created_at)
+            response.append(data)
+        return HttpResponse(json.dumps(response), content_type='application/json')
+
     ctx = {
         'category': post.category,
         'post': post,
         'tags': CategoryTag.objects.filter(category=post.category),
-        'post_replies': Reply.objects.filter(post=post),
+        'post_replies': replies,
     }
 
     return TemplateResponse(request, 'posts/detail.html', ctx)
@@ -90,6 +103,7 @@ def edit(request, post_id):
         return HttpResponse(post.id)
     return HttpResponseRedirect('/')
 
+@csrf_exempt
 @login_required
 def reply(request, post_id):
     if request.method == 'POST':
@@ -98,7 +112,10 @@ def reply(request, post_id):
         reply.author = request.user
         reply.content = request.POST.get('content')
         reply.save()
-        return HttpResponse(reply.id)
+
+        response = model_to_dict(reply)
+        response['user'] = _serialize_user(response['author'])
+        return HttpResponse(json.dumps(response), content_type='application/json')
     else:
         try:
             reply_id = int(request.GET.get('reply_id'))
@@ -107,16 +124,17 @@ def reply(request, post_id):
 
         reply = Reply.objects.get(pk=reply_id)
         response = model_to_dict(reply)
-        user = User.objects.get(pk=reply.author.id)
-        response['user'] = {
-            'username': user.username,
-            'id': user.id,
-            'gravatar': gravatar(user.email),
-        }
-        response['created_at'] = reply.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        response['user'] = _serialize_user(reply.author.id)
 
         return HttpResponse(json.dumps(response), content_type='application/json')
 
+def _serialize_user(user_id):
+    user = User.objects.get(pk=user_id)
+    return {
+        'username': user.username,
+        'id': user.id,
+        'gravatar': gravatar(user.email),
+    }
 
 def delete(request):
     object_id = request.GET.get('object_id')

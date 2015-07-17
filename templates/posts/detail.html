@@ -12,43 +12,34 @@
     <div class="active section">{{post.title}}</div>
   </div>
   
-  <div id="post-and-reply">
+  <div>
     <div class="ui segment" id="js-id-post-{{ post.id }}">
       <div class="ui grid stackable">
         <div class="eight wide column">
           <div class="card">
             <div class="content">
-              <img class="floated mini ui image" src="{{ post.author.email|gravatar }}">
-              <div class="header"><a href="{% url 'profile' post.author.id %}">{{ post.author }}</a></div>
-              <div class="meta">发表于 {{ post.created_at|timesince }} <a href="javascript:void(0)" onclick="showModal(event, this)" class="js-reply-post"><i class="icon circle"></i>回复</a>{% if request.user == post.author %}<a href="javascript:void(0)" class="delete"><i class="icon circle"></i>删除</a>{% endif %}</div>
+              <img class="floated ui image" src="{{ post.author.email|gravatar }}">
+              <div class="header"><h3><a href="{% url 'profile' post.author.id %}">{{ post.author }}</a></h3></div>
+              <div class="meta">发表于 {{ post.created_at|timesince }}</div>
+              <div class="actions">
+                <a href="javascript:void(0)" onclick="showModal(event, this)" class="js-reply-post">回复</a>{% if request.user == post.author %}<!--a href="javascript:void(0)" class="delete">删除</a-->{% endif %}
+              </div>
             </div>
           </div>
         </div>
         <div class="eight wide column">
           <div class="ui tiny statistics">
             <div class="statistic">
-              <div class="value">
-                22
-              </div>
-              <div class="label">
-                Replies
-              </div>
+              <div class="value">{{ post.count.reply }}</div>
+              <div class="label">Replies</div>
             </div>
             <div class="statistic">
-              <div class="value">
-                31,200
-              </div>
-              <div class="label">
-                Views
-              </div>
+              <div class="value">{{ post.pageviews }}</div>
+              <div class="label">Views</div>
             </div>
             <div class="statistic">
-              <div class="value">
-                0
-              </div>
-              <div class="label">
-                Like
-              </div>
+              <div class="value">0</div>
+              <div class="label">Like</div>
             </div>
           </div>
         </div>
@@ -59,9 +50,9 @@
       </div>
     </div>
 
-    <div class="ui segment">
-      {% for reply in post_replies %}
+    <div class="ui segment" id="js-id-comments">
       <div class="ui comments">
+      {% for reply in post_replies %}
         <div class="comment" id="js-id-reply-{{ reply.id }}">
           <a href="{% url 'profile' post.author.id %}" class="avatar"><img class="ui image avatar" src="{{ reply.author.email|gravatar }}" ></a>
           <div class="content">
@@ -69,44 +60,95 @@
             <div class="metadata"><div class="date">{{ reply.created_at|timesince }}</div></div>
             <div class="text">{{ reply.content|removetags:"script"|safe }}</div>
             <div class="actions">
-              <a href="javascript:void(0)" onclick="showModal(event, this)" data-username="{{ reply.author.username }}" class="js-reply-post" class="reply js-reply-post">回复</a>
               <!-- <a class="edit">编辑</a> -->
             </div>
           </div>
         </div>
-      </div>
       {% endfor %}
+      </div>
     </div>
   </div>
 </div>
 
-<div class="ui modal" id="js-id-modal">
-<!--   <i class="close icon"></i> -->
-  <div class="content">
-    <form id="js-id-form">{% csrf_token %}
-    <div class="ui form">
-      <div class="field">
-        <div class="input"><input type="text" name="title" value="{{ post.title }}" /></div>
-      </div>
-      <div class="field">
-        <div id="js-id-modal-editor" style="border: 1px solid #eee; border-radius: 5px;"></div>
-        <textarea name="content" style="display: none;"></textarea>
-      </div>
-    </div>
-    </form>
-  </div>
-  <div class="actions">
-    <a href="javascript:void(0)" class="ui button green" id="js-id-btn-save">提交</a>
-    <div class="ui button" onclick="$('#js-id-modal').modal('hide');">取消</div>
-  </div>
-</div>
 {% endblock %}
 
 {% block script %}
-
-
 <script>
-if (location.hash == '#latest') window.scrollTo(0, document.body.scrollHeight);
+var scrollToBottom = function () {
+  window.scrollTo(0, document.body.scrollHeight);
+}
 
+
+var Comments = React.createClass({displayName: "Comments",
+  getInitialState: function () {
+    return {
+      comments: [],
+      defaultText: ''
+    };
+  },
+  componentDidMount: function() {
+    $.get(null, function(response) {
+      if (this.isMounted())
+        this.setState({comments: response});
+    }.bind(this));
+  },
+  _reply: function (i, _self) {
+    var replyFormTextarea = React.findDOMNode(this.refs.replyFormTextarea),
+      comment = _self.state.comments[i];
+    replyFormTextarea.focus();
+    replyFormTextarea.value = '@' + comment.user.username + ' ';
+  },
+  _handleSubmit: function (e) {
+    e.preventDefault();
+    var replyFormTextarea = React.findDOMNode(this.refs.replyFormTextarea);
+    if (!replyFormTextarea.value || replyFormTextarea.value == '') return;
+    $.post('{% url 'reply_post' post.id %}', {content: replyFormTextarea.value}, function (response) {
+      var comments = this.state.comments;
+      response['style'] = {display: 'none'};
+      comments.push(response);
+
+      this.setState({comments: comments}, function () {
+        replyFormTextarea.value = '';
+        $('.comment:hidden').transition('fade');
+        scrollToBottom();
+      }.bind(this));
+    }.bind(this));
+  },
+  render: function () {
+    return (
+      React.createElement("div", {className: "ui comments"}, 
+        React.createElement("form", {ref: "replyForm", className: "ui reply form", onSubmit: this._handleSubmit}, 
+          React.createElement("div", {className: "field"}, React.createElement("textarea", {ref: "replyFormTextarea"})), 
+          React.createElement("button", {className: "ui primary submit labeled icon button"}, 
+            React.createElement("i", {className: "icon edit"}), " 回复"
+          )
+        ), 
+        this.state.comments.map(function (comment, i) {
+          return (
+            React.createElement("div", {className: "comment", style: comment.style}, 
+              React.createElement("a", {href: '/accounts/profile/' + comment.user.id + '/', className: "avatar"}, React.createElement("img", {className: "ui image avatar", src: comment.user.gravatar})), 
+              React.createElement("div", {className: "content"}, 
+                React.createElement("a", {className: "author"}, comment.user.username), 
+                React.createElement("div", {className: "metadata"}, React.createElement("div", {className: "date"}, comment.created_at || '0 minutes')), 
+                React.createElement("div", {className: "text"}, React.createElement("div", {id: "line-1", className: "line"}, comment.content)), 
+                React.createElement("div", {className: "actions"}, 
+                  React.createElement("a", {href: "javascript:void(0)", onClick: this._reply.bind(null, i, this)}, "回复")
+                )
+              )
+            )
+          );
+        }, this)
+      )
+    )
+  }
+});
+
+var comments = React.render(
+  React.createElement(Comments, null),
+  document.getElementById('js-id-comments')
+);
+
+
+if (location.hash == '#latest') scrollToBottom();
 </script>
 {% endblock %}
