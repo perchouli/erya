@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container">
-  <div class="ui breadcrumb">
+  <div class="ui huge breadcrumb">
     <a class="section" href="/">首页</a>
     <div class="divider"> / </div>
     <div class="active section">注册</div>
@@ -14,26 +14,13 @@
       <div class="ui form segment">
         <form id="js-id-form-login" action="" method="post" class="form-horizontal">
           {% csrf_token %}
+          {%for field in form %}
           <div class="field">
-            <label for="id_username">用户名</label>
-            <div class="ui left icon input">{{form.username}}</div>
-            <div class="ui red pointing above ui label" style="display:none;">{{form.username.errors}}</div>
+            <label for="id_username">{{ field.label }}</label>
+            <div class="ui left icon input">{{ field }}</div>
+            {% if field.errors %}<div class="ui pointing label red">{{ field.errors }}</div>{% endif %}
           </div>
-          <div class="field">
-            <label for="id_password">密码</label>
-            <div class="ui left icon input">{{form.password}}</div>
-            <div class="ui red pointing above ui label" style="display:none;">{{form.password.errors}}</div>
-          </div>
-          <div class="field">
-            <label for="id_confirm_password">确认密码</label>
-            <div class="ui left icon input">{{form.confirm_password}}</div>
-            <div class="ui red pointing above ui label" style="display:none;">{{form.confirm_password.errors}}</div>
-          </div>
-          <div class="field">
-            <label for="id_email">E-mail</label>
-            <div class="ui left icon input">{{form.email}}</div>
-            <div class="ui red pointing above ui label" style="display:none;">{{form.email.errors}}</div>
-          </div>
+          {% endfor %}
           <button class="ui button green" type="submit">注册</button>
         </form>
       </div>
@@ -49,6 +36,9 @@
 
 {% block script %}
 <script type="text/javascript">
-
+  $('.ui.input').each(function (i) {
+    var icons = ['user', 'lock', 'lock', 'mail'];
+    $(this).append('<i class="icon '+icons[i]+'"></i>');
+  });
 </script>
 {% endblock %}

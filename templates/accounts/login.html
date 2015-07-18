@@ -3,7 +3,7 @@
 
 {% block content %}
 <div class="container">
-  <div class="ui breadcrumb">
+  <div class="ui huge breadcrumb">
     <a class="section" href="/">首页</a>
     <div class="divider"> / </div>
     <div class="active section">登陆</div>
@@ -18,22 +18,13 @@
         <div class="ui form ">
         <form id="js-id-form-login" action="" method="post" class="form-horizontal">{% csrf_token %}
           {{form.non_field_errors}}
+          {%for field in form %}
           <div class="field">
-            <label>用户名</label>
-            <div class="ui left icon input">
-              {{form.username}}
-              <i class="user icon"></i>
-            </div>
-            <div class="ui red pointing above ui label" style="display: none;">{{form.username.errors}}</div>
+            <label for="id_username">{{ field.label }}</label>
+            <div class="ui left icon input">{{ field }}</div>
+            {% if field.errors %}<div class="ui pointing label red">{{ field.errors }}</div>{% endif %}
           </div>
-          <div class="field">
-            <label>密码</label>
-            <div class="ui left icon input">
-              {{form.password}}
-              <i class="lock icon"></i>
-            </div>
-            <div class="ui red pointing above ui label" style="display:none;">{{form.password.errors}}</div>
-          </div>
+          {% endfor %}
           <input type="hidden" name="next" value="/" />
           <button class="ui green button">登录</button>
         </form>
@@ -59,5 +50,10 @@
 {% endblock %}
 
 {% block script %}
-
+<script type="text/javascript">
+  $('.ui.input').each(function (i) {
+    var icons = ['user', 'lock', 'lock', 'mail'];
+    $(this).append('<i class="icon '+icons[i]+'"></i>');
+  });
+</script>
 {% endblock %}

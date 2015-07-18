@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 from django.forms.utils import ErrorList
 
 class LoginForm(AuthenticationForm):
-    username = forms.CharField(error_messages={'required': '用户名不能为空'}, max_length=30)
-    password = forms.CharField(widget=forms.PasswordInput, error_messages={'required': '密码不能为空'})
+    username = forms.CharField(label='用户名', error_messages={'required': '用户名不能为空'}, max_length=30)
+    password = forms.CharField(label='密码', widget=forms.PasswordInput, error_messages={'required': '密码不能为空'})
 
     def clean(self):
         username = self.cleaned_data.get('username')
@@ -22,10 +22,10 @@ class LoginForm(AuthenticationForm):
         return self.cleaned_data
 
 class RegistrationForm(forms.Form):
-    email = forms.EmailField(error_messages = {'required': 'E-mail不能为空'})
-    username = forms.CharField(error_messages = {'required': '用户名不能为空', 'max_length':'最多是8个字'}, max_length = 16)
-    password = forms.CharField(widget=forms.PasswordInput, error_messages = {'required': '密码不能为空', 'min_length':'至少是6个字符', 'max_length':'最多是16个字符'}, min_length = 6, max_length = 16)
-    confirm_password = forms.CharField(widget=forms.PasswordInput, error_messages = {'required': '确认密码不能为空', 'min_length':'至少是6个字符', 'max_length':'最多是16个字符'}, max_length = 16)
+    username = forms.CharField(label='用户名',error_messages={'required': '用户名不能为空', 'max_length':'最多是8个字'}, max_length = 16)
+    password = forms.CharField(label='密码',widget=forms.PasswordInput, error_messages = {'required': '密码不能为空', 'min_length':'至少是6个字符', 'max_length':'最多是16个字符'}, min_length = 6, max_length = 16)
+    confirm_password = forms.CharField(label='确认密码',widget=forms.PasswordInput, error_messages = {'required': '确认密码不能为空', 'min_length':'至少是6个字符', 'max_length':'最多是16个字符'}, max_length = 16)
+    email = forms.EmailField(error_messages={'required': 'E-mail不能为空'})
     
     def clean_email(self):
         email = self.cleaned_data['email']
