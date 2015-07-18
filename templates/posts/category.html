@@ -29,11 +29,14 @@
         <div class="content">
           <h3 class="header"><a href="{% url 'post_detail' post.id %}">{{ post.title }} {%if post.tag and not request.GET.tag_id %}<label class="ui label small {{ post.tag.color }}" style="border-radius: 0px;height: 1.5rem; line-height: 1;">{{ post.tag.name }}</label>{% endif %}</a></h3>
           <div class="meta">
-            <span class="cinema"><p>{{ post.created_at|timesince }} by <strong>{{ post.author.username }}</strong></p></span>
+            <span class="cinema"><p>{{ post.created_at|timesince }}前 由 <strong>{{ post.author.username }}</strong> 发表</p></span>
           </div>
           <div class="description">
             <p>{{ post.content|safe|filter_xss }}</p>
           </div>
+          {% if post.latest_reply %}
+          <div class="extra tiny" style="font-size:11px;">{{ post.latest_reply.author.username }} 在 {{ post.latest_reply.created_at|timesince }} 前回复</div>
+          {% endif %}
         </div>
       </div>
     {% endfor %}
