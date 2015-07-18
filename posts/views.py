@@ -159,7 +159,6 @@ def upload(request):
 
     file_type = str(upfile.name).split('.')[-1].lower()
     file_name = str(today.strftime("%Y%m%d%H-%f")) + '.' + file_type
-    print file_name
     upfile.name = file_name
     attachment = Attachment.objects.create(user=request.user, src=upfile)
     return HttpResponse(attachment.src.url)
