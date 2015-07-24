@@ -7,7 +7,7 @@ Erya
 
 系统的后端是简单的发布主题/回复/评论的功能，目前是基于Django(Python)的。使用Python3 + Django的架构，Python2.7测试通过。
 
-在界面上模仿NodeBB，前端使用SemanticUI，支持自适应，编辑器使用[Quilljs](http://quilljs.com/)，同样也是支持自适应的：
+前端使用SemanticUI，支持自适应，编辑器使用[Quilljs](http://quilljs.com/)，同样也是支持自适应的：
 
 因为是面向国内中文用户，所以没有Google的JS/字体API等容易被墙掉的性能。
 
