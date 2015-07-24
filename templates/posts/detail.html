@@ -21,8 +21,10 @@
               <img class="floated ui image" src="{{ post.author.email|gravatar }}">
               <div class="header"><h3><a href="{% url 'profile' post.author.id %}">{{ post.author }}</a></h3></div>
               <div class="meta">发表于 {{ post.created_at|timesince }}</div>
-              <div class="actions">
-                <a href="javascript:void(0)" onclick="showModal(event, this)" class="js-reply-post">回复</a>{% if request.user == post.author %}<!--a href="javascript:void(0)" class="delete">删除</a-->{% endif %}
+              <div class="actions" data-type="post" data-id={{ post.id }}>
+                {% if request.user == post.author %}
+                <a href="javascript:void(0)" class="js-delete">删除</a>
+                {% endif %}
               </div>
             </div>
           </div>
@@ -74,10 +76,27 @@
 
 {% block script %}
 <script>
+
+$('.actions .js-delete').popup({
+  inline: true,
+  on: 'click',
+  position : 'bottom left',
+  html: '删除主题？ <button class="ui red button mini" onclick="removeObject(event)">删除</button>',
+  variation: 'mini'
+});
+
+var removeObject = function (e) {
+  var $actions = $(e.currentTarget).closest('.actions');
+
+  $.get('/posts/delete/', {object_id: $actions.data('id'), type: $actions.data('type')}, function () {
+    $('.actions .js-delete').popup('hide');
+    location.href = '{% url 'category' post.category_id %}';
+  });
+};
+
 var scrollToBottom = function () {
   window.scrollTo(0, document.body.scrollHeight);
-}
-
+};
 
 var Comments = React.createClass({displayName: "Comments",
   getInitialState: function () {
@@ -117,20 +136,20 @@ var Comments = React.createClass({displayName: "Comments",
   render: function () {
     return (
       React.createElement("div", {className: "ui comments"},
-        React.createElement("form", {ref: "replyForm", className: "ui reply form", onSubmit: this._handleSubmit},
+        React.createElement("form", {ref: "replyForm", className: "ui reply form", onSubmit: this._handleSubmit}
           {% if user.is_authenticated %}
-          React.createElement("div", {className: "field"}, React.createElement("textarea", {ref: "replyFormTextarea"})),
-          React.createElement("button", {className: "ui primary submit labeled icon button"}, 
+          ,React.createElement("div", {className: "field"}, React.createElement("textarea", {ref: "replyFormTextarea"})),
+          React.createElement("button", {className: "ui primary submit labeled icon button"},
             React.createElement("i", {className: "icon edit"}), " 回复"
           )
           {% endif %}
-        ), 
+        ),
         this.state.comments.map(function (comment, i) {
           return (
             React.createElement("div", {className: "comment", style: comment.style},
               React.createElement("a", {href: '/accounts/profile/' + comment.user.id + '/', className: "avatar"}, React.createElement("img", {className: "ui image avatar", src: comment.user.gravatar})),
               React.createElement("div", {className: "content"},
-                React.createElement("a", {className: "author"}, comment.user.username), 
+                React.createElement("a", {className: "author"}, comment.user.username),
                 React.createElement("div", {className: "metadata"}, React.createElement("div", {className: "date"}, comment.created_at || '0 minutes')),
                 React.createElement("div", {className: "text"}, React.createElement("div", {id: "line-1", className: "line"}, comment.content)),
                 React.createElement("div", {className: "actions"},
