@@ -9,6 +9,7 @@
     <div class="divider"> / </div>
     <div class="active section">{{ category.name }}</div>
   </div>
+  <div class="ui divider"></div>
   {% if category.description or category.categorytag_set.count %}
   <div class="ui segment">
     {{ category.description|safe }}
