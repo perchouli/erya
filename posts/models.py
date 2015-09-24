@@ -90,6 +90,10 @@ class Post(models.Model):
     def latest_reply(self):
         return Reply.objects.filter(post=self).latest('created_at')
 
+    def get_absolute_url(self):
+        from django.core.urlresolvers import reverse
+        return reverse('posts.views.post_detail', args=[str(self.id)])
+
 
 class Reply(models.Model):
     post = models.ForeignKey(Post, related_name='post')

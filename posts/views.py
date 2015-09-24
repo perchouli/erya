@@ -162,3 +162,16 @@ def upload(request):
     upfile.name = file_name
     attachment = Attachment.objects.create(user=request.user, src=upfile)
     return HttpResponse(attachment.src.url)
+
+def search(request):
+    if request.GET.get('q'):
+        q = request.GET.get('q')
+        posts = []
+        for post in Post.objects.filter(title__contains=q):
+            url = post.get_absolute_url()
+            post = model_to_dict(post)
+            post['url'] = url
+            posts.append(post)
+        
+        response = {"status" : "ok", "data": posts}
+        return HttpResponse(json.dumps(response), content_type='application/json')

@@ -13,20 +13,15 @@
   <script src="{% static 'javascript/react.min.js' %}"></script>
 </head>
 <body id="erya">
-  <div id="top-menu" class="ui secondary pointing menu">
+  <div id="top-menu" class="ui stackable menu">
     <a class="logo item" href="/" title="Logo">ERYA</a>
     {% for category in CATEGORIES %}
       <a class="item item-category" href="{% url 'category' category.id %}" title="{{ category.name }}"><i class="icon help {{ category.icon }}"></i></a>
     {% endfor %}
-    <div class="section ui dropdown link item">
-      <i class="icon block layout"></i>
-      <div class="menu ui transition hidden">
-        <div class="item">
-          <a href="https://github.com/perchouli/erya">Github主页</a>
-        </div>
-        <div class="item">
-          <a href="http://bbs.dmyz.org" target="_blank">讨论</a>
-        </div>
+    <div class="ui search item">
+      <div class="ui left icon input">
+        <input autocomplete="off" class="prompt" placeholder="Search..." type="text">
+        <i class="search icon"></i>
       </div>
     </div>
     <div class="right menu">
@@ -55,6 +50,25 @@ $('#top-menu .ui.dropdown').dropdown();
 $('#top-menu a.item-category').popup({
   delay: 50
 });
+
+
+$('.ui.search')
+  .search({
+    apiSettings: {
+      url: '{% url 'search_post' %}?q={query}'
+    },
+    fields: {
+      results : 'data',
+      title   : 'title',
+      url     : 'url'
+    },
+    minCharacters : 3,
+    onSelect: function (result, response) {
+      location.href = result.url;
+    }
+  })
+;
+
 {% if NOTIFICATIONS %}
   var notices = document.createElement('div');
   notices.className = 'ui small list';

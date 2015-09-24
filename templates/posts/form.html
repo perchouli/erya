@@ -53,7 +53,7 @@
         <i class="photo icon" id="js-id-icon-photo" style="position: absolute;bottom: 60px;cursor: pointer; font-size: 40px;margin-top: -70px;"></i>
       </form>
       {% else %}
-      <div class="ui floating">
+      <div class="ui error message" style="display: block;">
         <strong>发布信息前请先<a href="{% url 'login' %}?next={{ request.path }}">登录</a>。</strong> 
       </div>
       {% endif %}
