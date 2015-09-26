@@ -13,13 +13,13 @@
         <div class="content">
           <div class="header"><a href="{% url 'category' category.id %}">{{ category.name }}</a></div>
           <div class="meta">
-            <a href="{% url 'post_detail' category.latest_post.id %}">{{ category.num_posts }} Posts</a>
+            <a href="{% if category.latest_post %}{% url 'post_detail' category.latest_post.id %}{% endif %}">{{ category.num_posts }} Posts</a>
           </div>
           <div class="description">{{ category.description|safe }}</div>
         </div>
         <div class="extra content">
           <span class="right floated">
-            <a href="{% url 'post_detail' category.latest_post.id %}">{{ category.latest_post.created_at|timesince }}</a>
+            <a href="{% if category.latest_post %}{% url 'post_detail' category.latest_post.id %}{% endif %}">{{ category.latest_post.created_at|timesince }}</a>
           </span>
           <span>
             <i class="user icon"></i>
