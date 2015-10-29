@@ -1,9 +1,8 @@
 Erya
 ====
 
-[Erya](https://github.com/perchouli/erya)是基于[SemanticUI](http://semantic-ui.com/)开发的内容发布系统，主要用来搭建BBS。遵守GPLV3协议。
+[Erya](https://github.com/perchouli/erya)是基于[SemanticUI](http://semantic-ui.com/)开发的内容发布系统，主要用来搭建BBS。
 
-![erya](http://dmyz.org/wp-content/uploads/2014/07/erya.jpg)
 
 系统的后端是简单的发布主题/回复/评论的功能，目前是基于Django(Python)的。使用Python3 + Django的架构，Python2.7测试通过。
 
