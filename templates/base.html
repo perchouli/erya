@@ -31,7 +31,7 @@
         <img class="ui avatar image" src="{{ request.user.email|gravatar }}" style="height:25px; width: 25px;"/>
       </a>
       <a class="item" href="{% url 'profile' request.user.id %}">{{ request.user.username }}</a>
-      <a class="item" href="{% url 'django.contrib.auth.views.logout' %}">退出</a>
+      <a class="item" href="{% url 'logout' %}">退出</a>
       {% else %}
       <a class="item" href="{% url 'register' %}">注册</a>
       <a class="item" href="{% url 'login' %}">登录</a>
