@@ -38,9 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'accounts',
-    'posts',
-    'actstream',
 ]
 
 MIDDLEWARE = [
@@ -125,7 +122,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
 # USER DEFINED
+INSTALLED_APPS += [
+    'accounts',
+    'posts',
+    'actstream',
+    'rest_framework',
+]
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )

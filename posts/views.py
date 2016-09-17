@@ -10,13 +10,19 @@ from django.contrib.auth.models import User
 from django.utils import timesince
 
 from .models import Category, CategoryTag, Post, Reply, Attachment
+from .serializers import PostSerializer
 from accounts.templatetags.users_tags import gravatar
 
 from actstream.models import Action
+from rest_framework import viewsets
 import random
 import datetime
 import json
 import bleach
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all().order_by('-created_at')
+    serializer_class = PostSerializer
 
 def post_list(request, category_id):
     category = Category.objects.get(pk=category_id)

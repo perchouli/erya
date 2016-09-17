@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.conf import settings
 
 from django.contrib.auth import views as auth_views
+import erya.api
 import erya.views
 
 urlpatterns = [
@@ -13,4 +14,4 @@ urlpatterns = [
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
-] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + erya.api.api_urlpatterns
