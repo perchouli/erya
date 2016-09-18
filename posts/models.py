@@ -11,10 +11,19 @@ from actstream import registry, action
 import re
 
 class Category(models.Model):
+    COLOR_CHOICES = (
+        ('red', '红色'),
+        ('blue', '蓝色'),
+        ('green', '绿色'),
+        ('purpel', '紫色'),
+        ('black', '黑色'),
+    )
     name = models.CharField(max_length=32)
-    sort = models.IntegerField()
+    sort = models.IntegerField(null=True, blank=True)
     icon = models.CharField(max_length=16, blank=True)
     description = models.TextField(blank=True)
+    parent = models.ForeignKey('Category', null=True, blank=True)
+    color = models.CharField(max_length=48, choices=COLOR_CHOICES, null=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -28,25 +37,6 @@ class Category(models.Model):
     def num_posts(self):
         return Post.objects.filter(category=self).count()
 
-class CategoryTag(models.Model):
-    COLOR_CHOICES = (
-        ('red', '红色'),
-        ('blue', '蓝色'),
-        ('green', '绿色'),
-        ('purpel', '紫色'),
-        ('black', '黑色'),
-    )
-    name = models.CharField(max_length=32)
-    category = models.ForeignKey(Category)
-    color = models.CharField(max_length=48, choices=COLOR_CHOICES, default='success')
-    sort = models.IntegerField()
-    description = models.TextField(blank=True)
-
-    def __unicode__(self):
-        return self.name
-
-    def __str__(self):
-        return self.name
 
 class Post(models.Model):
     STATUS_REVIEW = 'review'
@@ -67,7 +57,6 @@ class Post(models.Model):
     category = models.ForeignKey(Category)
     created_at = models.DateTimeField(auto_now_add=True, editable=True)
     content = models.TextField()
-    tag = models.ForeignKey(CategoryTag, max_length=64, blank=True, null=True)
     status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_APPROVED, db_index=True)
     author = models.ForeignKey(User, null=True)
     reply = models.DateTimeField(auto_now_add=True)

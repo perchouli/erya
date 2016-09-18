@@ -3,3 +3,4 @@ Pillow
 django-activity-stream==0.6.3
 bleach
 djangorestframework==3.4.6
+django-filter==0.14.0

@@ -2,11 +2,12 @@ from django.conf.urls import url, include
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 
-from posts.views import PostViewSet
+from posts.views import PostViewSet, CategoryViewSet
 
 
 router = routers.DefaultRouter()
 router.register(r'posts', PostViewSet)
+router.register(r'categories', CategoryViewSet)
 
 api_urlpatterns = [
     url(r'^api/', include(router.urls)),

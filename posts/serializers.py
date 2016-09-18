@@ -1,9 +1,14 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from .models import Post
+from .models import Category, Post
 
-class PostSerializer(serializers.HyperlinkedModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+
+
+
+class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ('title',)
 

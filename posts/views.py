@@ -9,12 +9,12 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.utils import timesince
 
-from .models import Category, CategoryTag, Post, Reply, Attachment
-from .serializers import PostSerializer
+from .models import Category, Post, Reply, Attachment
+from .serializers import PostSerializer, CategorySerializer
 from accounts.templatetags.users_tags import gravatar
 
 from actstream.models import Action
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 import random
 import datetime
 import json
@@ -24,30 +24,12 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
 
-def post_list(request, category_id):
-    category = Category.objects.get(pk=category_id)
-    tags = CategoryTag.objects.filter(category=category)
-    page_size = 50
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all().order_by('-sort')
+    serializer_class = CategorySerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('parent', )
 
-    posts = Post.objects.approved().filter(category=category).order_by('-created_at')
-    if request.GET.get('tag_id'):
-        posts = posts.filter(tag_id=int(request.GET.get('tag_id')))
-
-    paginator = Paginator(posts, page_size)
-    page = request.GET.get('page', 1)
-    try:
-        page = int(page)
-    except:
-        page = 1
-    posts = paginator.page(page)
-
-    ctx = {
-        'paginator': paginator,
-        'tags': tags,
-        'category': category,
-        'posts': posts,
-    }
-    return TemplateResponse(request, 'posts/category.html', ctx)
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
