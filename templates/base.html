@@ -15,9 +15,6 @@
 <body id="erya">
   <div id="top-menu" class="ui stackable menu">
     <a class="logo item" href="/" title="Logo">ERYA</a>
-    {% for category in CATEGORIES %}
-      <a class="item item-category" href="{% url 'category' category.id %}" title="{{ category.name }}"><i class="icon help {{ category.icon }}"></i></a>
-    {% endfor %}
     <div class="ui search item">
       <div class="ui left icon input">
         <input autocomplete="off" class="prompt" placeholder="Search..." type="text">
@@ -45,54 +42,7 @@
   </div><!--end footer -->
 <script src="{% static 'javascript/jquery-3.1.0.min.js' %}"></script>
 <script src="{% static 'javascript/semantic.min.js' %}"></script>
-<script src="{% static 'javascript/posts.js' %}"></script>
-<script>
-$('#top-menu .ui.dropdown').dropdown();
-$('#top-menu a.item-category').popup({
-  delay: 50
-});
-
-$('.ui.search')
-  .search({
-    apiSettings: {
-      url: '{% url 'search_post' %}?q={query}'
-    },
-    fields: {
-      results : 'data',
-      title   : 'title',
-      url     : 'url'
-    },
-    minCharacters : 3,
-    onSelect: function (result, response) {
-      location.href = result.url;
-    }
-  })
-;
-
-{% if NOTIFICATIONS %}
-  var notices = document.createElement('div');
-  notices.className = 'ui small list';
-
-  {% for notice in NOTIFICATIONS %}
-  var notice = document.createElement('div'),
-    iconMap = {
-      'receive': 'mail',
-      'reminded': 'email basic'
-    };//未使用。目前只有两种notification，先用if处理
-
-  notice.className = 'item';
-  notice.innerHTML = '<i class="{% if notice.verb == 'receive' %}mail{% else %}email basic{% endif %} outline icon"></i><div class="content"><div class="description">' +
-    '<a href="{% url 'profile' notice.action_object.author.id %}">{{ notice.action_object.author }}</a>在<a href="{% url 'post_detail' notice.target.id %}{% if notice.verb == 'reminded' %}#js-id-reply-{{ notice.action_object.id }}{% endif %}">{{ notice.target.title }}</a>{% if notice.verb == 'receive' %}回复{% else %}提到{% endif %}了你' + 
-    '</div></div></div>';
-  notices.appendChild(notice);
-  {% endfor %}
-
-  $('#top-menu .avatar').popup({
-    'html': notices.outerHTML,
-  });
-  $('#top-menu .avatar').popup('show');
-{% endif %}
-</script>
+<script src="{% static 'javascript/main.js' %}"></script>
 {% block script %}{% endblock %}
 </body>
 </html>
