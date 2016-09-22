@@ -11,7 +11,7 @@ from django.utils import timesince
 
 from .models import Category, Post, Reply, Attachment
 from .serializers import PostSerializer, CategorySerializer
-from accounts.templatetags.users_tags import gravatar
+from accounts.templatetags.user_tags import gravatar
 
 from actstream.models import Action
 from rest_framework import viewsets, filters
