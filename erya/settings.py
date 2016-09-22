@@ -64,8 +64,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-
-                'erya.context_processors.categories',
             ],
         },
     },
@@ -137,3 +135,5 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'templates'),]
 MIDDLEWARE += ['django.contrib.auth.middleware.SessionAuthenticationMiddleware', 'django.middleware.security.SecurityMiddleware',]
+
+BLEACH_ALLOWED_TAGS = ['b', 'i', 'u', 'em', 'strong', 'a']
