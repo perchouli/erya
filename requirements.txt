@@ -1,6 +1,6 @@
 Django==1.10.1
 Pillow
 django-activity-stream==0.6.3
-bleach
+bleach==1.4.3
 djangorestframework==3.4.6
 django-filter==0.14.0
