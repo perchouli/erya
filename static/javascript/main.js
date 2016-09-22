@@ -98,12 +98,12 @@ var Home = function (_React$Component) {
               return React.createElement(
                 'div',
                 { className: 'item' },
-                React.createElement('img', { className: 'ui avatar image', src: '/images/avatar/small/daniel.jpg' }),
+                React.createElement('img', { className: 'ui avatar image mini', src: post.author_gravatar }),
                 React.createElement(
                   'div',
                   { className: 'content' },
                   React.createElement(
-                    'a',
+                    'h3',
                     { className: 'header' },
                     post.title
                   ),
@@ -113,7 +113,14 @@ var Home = function (_React$Component) {
                     React.createElement(
                       'p',
                       null,
-                      '10 months, 4 weeks前 由 root 发表'
+                      post.created_at,
+                      ' 由 ',
+                      React.createElement(
+                        'strong',
+                        null,
+                        post.author
+                      ),
+                      ' 发表'
                     )
                   ),
                   React.createElement(

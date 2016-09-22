@@ -47,10 +47,10 @@ class Home extends React.Component {
         {this.state.posts.map(post => {
           return(
             <div className="item">
-              <img className="ui avatar image" src="/images/avatar/small/daniel.jpg"/>
+              <img className="ui avatar image mini" src={post.author_gravatar}/>
               <div className="content">
-              <a className="header">{post.title}</a>
-              <div className="meta"><p>10 months, 4 weeks前 由 root 发表</p></div>
+              <h3 className="header">{post.title}</h3>
+              <div className="meta"><p>{post.created_at} 由 <strong>{post.author}</strong> 发表</p></div>
               <div className="description">{post.content}</div>
               </div>
             </div>
