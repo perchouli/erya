@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.utils import timesince
 
-from .models import Category, Post, Reply, Attachment
+from .models import Category, Post, Attachment
 from .serializers import PostSerializer, CategorySerializer
 from accounts.templatetags.user_tags import gravatar
 
@@ -23,6 +23,8 @@ import bleach
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_fields = ('id', 'category', 'parent')
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by('-sort')
@@ -36,28 +38,13 @@ def post_detail(request, post_id):
     post.pageviews = post.pageviews + 1
     post.save()
 
-    replies = Reply.objects.filter(post=post)
-
-    # 暂时以修改verb的方式实现清除回帖提醒
     if request.user:
         notices = Action.objects.filter(actor_object_id=request.user.id, target_object_id=post.id).exclude(verb='read')
         notices.update(verb='read')
 
-    if request.is_ajax():
-        response = []
-        for reply in replies:
-            data = model_to_dict(reply)
-            data['user'] = _serialize_user(data['author'])
-            data['content'] = bleach.clean(data['content'], ['a',], strip=True)
-            data['created_at'] = timesince.timesince(reply.created_at)
-            response.append(data)
-        return HttpResponse(json.dumps(response), content_type='application/json')
-
     ctx = {
         'category': post.category,
         'post': post,
-        'tags': CategoryTag.objects.filter(category=post.category),
-        'post_replies': replies,
     }
 
     return TemplateResponse(request, 'posts/detail.html', ctx)
@@ -69,11 +56,10 @@ def create(request):
         if not category_id:
             category_id = 1
         category = Category.objects.get(pk=category_id)
-        tag_id = request.POST.get('tag')
         title = request.POST.get('title')
         content = request.POST.get('content', '')
 
-        post, is_create = Post.objects.get_or_create(title=title, content=content, category=category, tag_id=tag_id, author=request.user)
+        post, is_create = Post.objects.get_or_create(title=title, content=content, category=category, author=request.user)
         post.save()
 
         return HttpResponseRedirect('/posts/%s/' % post.id)

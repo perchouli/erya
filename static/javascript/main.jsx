@@ -49,7 +49,7 @@ class Home extends React.Component {
             <div className="item">
               <img className="ui avatar image mini" src={post.author_gravatar}/>
               <div className="content">
-              <h3 className="header">{post.title}</h3>
+              <h3 className="header"><a href={`posts/${post.id}/`}>{post.title}</a></h3>
               <div className="meta"><p>{post.created_at} 由 <strong>{post.author}</strong> 发表</p></div>
               <div className="description">{post.content}</div>
               </div>
@@ -64,8 +64,46 @@ class Home extends React.Component {
   }
 }
 
-[Home, ].forEach( app => {
+class ReplyList extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      replies: [],
+    };
+  }
+
+  componentDidMount() {
+    let postId = this.props.postId;
+    $.getJSON(`/api/posts/?parent=${postId}`, replies => {
+      this.setState({replies: replies});
+    });
+  }
+  render() {
+    return (
+      <div className="ui very relaxed list">
+        {this.state.replies.map(post => {
+          return(
+            <div className="item">
+              <img className="ui avatar image mini" src={post.author_gravatar}/>
+              <div className="content">
+              <h3 className="header"><a href={`posts/${post.id}/`}>{post.title}</a></h3>
+              <div className="meta"><p>{post.created_at} 由 <strong>{post.author}</strong> 发表</p></div>
+              <div className="description">{post.content}</div>
+              </div>
+            </div>
+            )
+          })
+        }
+      </div>
+    );
+  }
+}
+
+[Home, ReplyList].forEach( app => {
   let name = app.name.toLowerCase();
-  if (document.getElementById(name))
-    ReactDOM.render(React.createElement(app), document.getElementById(name));
+  if (document.getElementById(name)) {
+    let dom = document.getElementById(name),
+      props = dom.dataset;
+    ReactDOM.render(React.createElement(app, props), dom);
+  }
 });
