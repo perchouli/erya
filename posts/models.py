@@ -62,6 +62,7 @@ class Post(models.Model):
     reply = models.DateTimeField(auto_now_add=True)
     pageviews = models.IntegerField(default=0)
     comments = models.IntegerField(default=0)
+    parent = models.ForeignKey('self', null=True)
 
     focus = models.BooleanField(default=False)
 
