@@ -73,40 +73,16 @@ class Post(models.Model):
 
     def count(self):
         return {
-            'reply': Reply.objects.filter(post=self).count(),
+
         }
 
     def latest_reply(self):
-        return Reply.objects.filter(post=self).latest('created_at')
+        return Post.objects.filter(parent=self).latest('created_at')
 
     def get_absolute_url(self):
         from django.core.urlresolvers import reverse
         return reverse('posts.views.post_detail', args=[str(self.id)])
 
-
-class Reply(models.Model):
-    post = models.ForeignKey(Post, related_name='post')
-    created_at = models.DateTimeField(auto_now_add=True, editable=True)
-    author = models.ForeignKey(User)
-    content = models.TextField()
-
-    def __unicode__(self):
-        return self.post.title
-
-    def __str__(self):
-        return self.post.title
-
-def reply_notice(sender, instance, created, **kwargs):
-    if instance.post.author != instance.author:
-        action.send(instance.post.author, verb='receive', action_object=instance, target=instance.post)
-
-    at_username = re.search('<span\ style="color:#638911">@(\S+)</span>', instance.content)
-    if at_username:
-        username = at_username.group(1).strip()
-        user = User.objects.get(username=username)
-        if user != instance.author:
-            action.send(user, verb='reminded', action_object=instance, target=instance.post)
-post_save.connect(reply_notice, sender=Reply)
 
 def get_file_path(model, file_name):
     return '%d/%s' % (model.user.id, file_name)

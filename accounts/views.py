@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.template.response import TemplateResponse
 
-from posts.models import Post, Reply
+from posts.models import Post
 
 from .forms import RegistrationForm
 from .models import UserProfile
@@ -44,6 +44,6 @@ def profile(request, user_id):
         'master': master,
         'recent_posts': recent_posts,
         'user_profile': user_profile,
-        'count': Post.objects.filter(author=master).count() + Reply.objects.filter(author=master).count(),
+        'count': Post.objects.filter(author=master).count(),
     }
     return TemplateResponse(request, 'accounts/profile.html', ctx)
