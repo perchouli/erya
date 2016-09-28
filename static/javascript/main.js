@@ -12,7 +12,7 @@ class Home extends React.Component {
       this.setState({ categories: categories });
     });
 
-    $.getJSON('/api/posts/', posts => {
+    $.getJSON('/api/posts/?parent_isnull=True', posts => {
       this.setState({ posts: posts });
     });
   }
@@ -136,43 +136,37 @@ class ReplyList extends React.Component {
   render() {
     return React.createElement(
       'div',
-      { className: 'ui very relaxed list' },
+      { className: 'ui comments' },
       this.state.replies.map(post => {
         return React.createElement(
           'div',
-          { className: 'item' },
-          React.createElement('img', { className: 'ui avatar image mini', src: post.author_gravatar }),
+          { className: 'comment' },
+          React.createElement(
+            'a',
+            { className: 'avatar' },
+            React.createElement('img', { className: 'ui avatar image mini', src: post.author_gravatar })
+          ),
           React.createElement(
             'div',
             { className: 'content' },
             React.createElement(
-              'h3',
-              { className: 'header' },
-              React.createElement(
-                'a',
-                { href: `posts/${ post.id }/` },
-                post.title
-              )
+              'a',
+              { className: 'author', href: '#' },
+              post.author
             ),
             React.createElement(
               'div',
-              { className: 'meta' },
+              { className: 'metadata' },
               React.createElement(
-                'p',
-                null,
+                'div',
+                { className: 'date' },
                 post.created_at,
-                ' 由 ',
-                React.createElement(
-                  'strong',
-                  null,
-                  post.author
-                ),
-                ' 发表'
+                ' '
               )
             ),
             React.createElement(
               'div',
-              { className: 'description' },
+              { className: 'text' },
               post.content
             )
           )

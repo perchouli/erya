@@ -12,7 +12,7 @@ class Home extends React.Component {
       this.setState({categories: categories});
     });
 
-    $.getJSON('/api/posts/', posts => {
+    $.getJSON('/api/posts/?parent_isnull=True', posts => {
       this.setState({posts: posts});
     });
   }
@@ -80,15 +80,15 @@ class ReplyList extends React.Component {
   }
   render() {
     return (
-      <div className="ui very relaxed list">
+      <div className="ui comments">
         {this.state.replies.map(post => {
           return(
-            <div className="item">
-              <img className="ui avatar image mini" src={post.author_gravatar}/>
+            <div className="comment">
+              <a className="avatar"><img className="ui avatar image mini" src={post.author_gravatar}/></a>
               <div className="content">
-              <h3 className="header"><a href={`posts/${post.id}/`}>{post.title}</a></h3>
-              <div className="meta"><p>{post.created_at} 由 <strong>{post.author}</strong> 发表</p></div>
-              <div className="description">{post.content}</div>
+                <a className="author" href="#">{post.author}</a>
+                <div className="metadata"><div className="date">{post.created_at} </div></div>
+                <div className="text">{post.content}</div>
               </div>
             </div>
             )

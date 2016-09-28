@@ -13,6 +13,7 @@ from .models import Category, Post, Attachment
 from .serializers import PostSerializer, CategorySerializer
 from accounts.templatetags.user_tags import gravatar
 
+import django_filters
 from actstream.models import Action
 from rest_framework import viewsets, filters
 import random
@@ -20,11 +21,17 @@ import datetime
 import json
 import bleach
 
+class PostFilter(filters.FilterSet):
+    parent_isnull = django_filters.BooleanFilter(name='parent', lookup_type='isnull')
+    class Meta:
+        model = Post
+        fields = ('id', 'category', 'parent')
+
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
     filter_backends = (filters.DjangoFilterBackend,)
-    filter_fields = ('id', 'category', 'parent')
+    filter_class = PostFilter
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by('-sort')
