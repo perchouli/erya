@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from django.utils.timesince import timesince
 from rest_framework import serializers
 
 from .models import Category, Post
@@ -21,6 +22,7 @@ class PostSerializer(serializers.ModelSerializer):
     content = serializers.SerializerMethodField()
     author_gravatar = serializers.SerializerMethodField()
     author = serializers.StringRelatedField(read_only=True)
+    created_at = serializers.SerializerMethodField()
 
 
     def get_content(self, obj):
@@ -28,3 +30,6 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_author_gravatar(self, obj):
         return gravatar(obj.author.email)
+
+    def get_created_at(self, obj):
+        return timesince(obj.created_at)

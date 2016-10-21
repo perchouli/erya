@@ -16,11 +16,16 @@ class Home extends React.Component {
       this.setState({posts: posts});
     });
   }
+
+  _filterByCategory(categoryId) {
+    $.getJSON(`/api/posts/?parent_isnull=True&category=${categoryId}`, posts => this.setState({posts: posts}));
+  }
+
   render() {
     return (
       <div className="ui grid container">
         <div className="four wide column">
-          <button className="fluid ui button">发表主题</button>
+          <button className="fluid ui primary button">发表主题</button>
           <div className="ui large selection animated list">
             <div className="item">
               <i className="comment icon"></i>
@@ -31,9 +36,9 @@ class Home extends React.Component {
               <div className="content">所有分类</div>
             </div>
             <div className="ui divider"></div>
-        {this.state.categories.map(category => {
+        {this.state.categories.map((category, i) => {
           return(
-            <div className="item">
+            <div key={i} className="item" onClick={this._filterByCategory.bind(this, category.id)}>
               <i className={(category.icon || 'square') + ' icon'}></i>
               <div className="content">{category.name}</div>
             </div>

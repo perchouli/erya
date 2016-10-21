@@ -16,6 +16,11 @@ class Home extends React.Component {
       this.setState({ posts: posts });
     });
   }
+
+  _filterByCategory(categoryId) {
+    $.getJSON(`/api/posts/?parent_isnull=True&category=${ categoryId }`, posts => this.setState({ posts: posts }));
+  }
+
   render() {
     return React.createElement(
       'div',
@@ -25,7 +30,7 @@ class Home extends React.Component {
         { className: 'four wide column' },
         React.createElement(
           'button',
-          { className: 'fluid ui button' },
+          { className: 'fluid ui primary button' },
           '发表主题'
         ),
         React.createElement(
@@ -52,10 +57,10 @@ class Home extends React.Component {
             )
           ),
           React.createElement('div', { className: 'ui divider' }),
-          this.state.categories.map(category => {
+          this.state.categories.map((category, i) => {
             return React.createElement(
               'div',
-              { className: 'item' },
+              { key: i, className: 'item', onClick: this._filterByCategory.bind(this, category.id) },
               React.createElement('i', { className: (category.icon || 'square') + ' icon' }),
               React.createElement(
                 'div',
