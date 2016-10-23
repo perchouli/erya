@@ -11,7 +11,7 @@ import erya.views
 
 urlpatterns = [
     url(r'^accounts/', include('accounts.urls')),
-    url(r'posts/', include('posts.urls')),
+    url(r'^posts/', include('posts.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),

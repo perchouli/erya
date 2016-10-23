@@ -3,10 +3,23 @@ from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.template.response import TemplateResponse
 
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import viewsets, filters
+
 from posts.models import Post
 
 from .forms import RegistrationForm
 from .models import UserProfile
+from .serializers import UserSerializer
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
 
 def register(request):
     if request.user.is_authenticated():
