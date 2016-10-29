@@ -1,3 +1,16 @@
+class Helper {
+  static getCSRFToken() {
+    let csrfToken = '';
+    if (document.cookie && document.cookie !== '') {
+      document.cookie.split(';').forEach(cookie => {
+        let [name, value] = cookie.split('=');
+        if (name === 'csrftoken') csrfToken = value;
+      });
+    }
+    return csrfToken;
+  }
+}
+
 class Home extends React.Component {
   constructor(props) {
     super(props);
@@ -18,7 +31,20 @@ class Home extends React.Component {
   }
 
   _filterByCategory(categoryId) {
-    $.getJSON(`/api/posts/?parent_isnull=True&category=${ categoryId }`, posts => this.setState({ posts: posts }));
+    let url = '/api/posts/?parent_isnull=True' + (categoryId === null ? '' : '&category=' + categoryId);
+    $.getJSON(url, posts => this.setState({ posts: posts }));
+  }
+
+  _createPost() {
+    let csrfToken = Helper.getCSRFToken();
+    $.ajax({
+      method: 'POST',
+      url: '/api/posts/',
+      headers: { 'X-CSRFToken': csrfToken },
+      error: response => {
+        location.href = '/accounts/login/';
+      }
+    });
   }
 
   render() {
@@ -30,7 +56,7 @@ class Home extends React.Component {
         { className: 'four wide column' },
         React.createElement(
           'button',
-          { className: 'fluid ui primary button' },
+          { className: 'fluid ui primary button', onClick: this._createPost.bind(this) },
           '发表主题'
         ),
         React.createElement(
@@ -38,7 +64,7 @@ class Home extends React.Component {
           { className: 'ui large selection animated list' },
           React.createElement(
             'div',
-            { className: 'item' },
+            { className: 'item', onClick: this._filterByCategory.bind(this, null) },
             React.createElement('i', { className: 'comment icon' }),
             React.createElement(
               'div',

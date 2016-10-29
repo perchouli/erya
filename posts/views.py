@@ -16,10 +16,18 @@ from accounts.templatetags.user_tags import gravatar
 import django_filters
 from actstream.models import Action
 from rest_framework import viewsets, filters
+from rest_framework.response import Response
+from rest_framework.exceptions import APIException
 import random
 import datetime
 import json
 import bleach
+
+
+class UnauthorizedException(APIException):
+    status_code = 403
+    default_detail = 'Please login'
+
 
 class PostFilter(filters.FilterSet):
     parent_isnull = django_filters.BooleanFilter(name='parent', lookup_type='isnull')
@@ -32,6 +40,13 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filter_class = PostFilter
+
+    def create(self, request):
+        if not request.user.is_authenticated():
+            raise UnauthorizedException
+        else:
+            return Response()
+
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all().order_by('-sort')
