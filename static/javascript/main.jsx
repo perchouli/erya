@@ -10,6 +10,90 @@ class Helper {
     }
     return csrfToken;
   }
+
+  static checkLogin() {
+    let csrfToken = this.getCSRFToken(),
+      isLogin = false;
+    $.ajax({
+      async: false,
+      method: 'POST',
+      url: '/api/posts/',
+      headers: {'X-CSRFToken': csrfToken},
+      error: response => {
+        location.href = '/accounts/login/';
+      },
+      success: () => {
+        isLogin = true;
+      }
+    });
+    return isLogin;
+  }
+
+  static displayPostEditor() {
+    this.checkLogin();
+    let sidebarSelector = '#editorSidebar';
+
+    if ($(sidebarSelector).sidebar('is hidden'))
+      $(sidebarSelector).sidebar({dimPage: false, closable: false}).sidebar('show');
+
+  }
+
+}
+
+class PostEditor extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+    };
+  }
+
+  componentDidMount() {
+    //
+  }
+
+  _submit(e) {
+    let form = e.target,
+      csrfToken = Helper.getCSRFToken(),
+      data = $(form).serialize();
+    $.ajax({
+      method: 'POST',
+      url: '/api/posts/',
+      data: data,
+      headers: {'X-CSRFToken': csrfToken},
+      success: (response) => {
+        response = {title: 'test', 'content': 'test'};
+        this.props.insertPost(response)
+      }
+    });
+
+    e.preventDefault();
+  }
+
+  render() {
+    return (
+      <div className="ui bottom sidebar" id="editorSidebar" style={{padding: '10px 20px', backgroundColor: 'white'}}>
+        <form onSubmit={this._submit.bind(this)}>
+          <div className="ui form">
+            <div className="fields">
+              <div className="field six wide">
+                <select className="ui search dropdown">
+                  <option>选择分类</option>
+                {this.props.categories.map((category, i) => {
+                  return <option key={i} value={category.id}>{category.name}</option>;
+                })}
+                </select>
+              </div>
+              <div className="field ten wide">
+                <input name="title" placeholder="输入标题" />
+              </div>
+            </div>
+            <div className="field sixteen wide"><textarea name="content" placeholder="输入内容..." /></div>
+            <button className="ui button primary" type="submit">发布</button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 }
 
 class Home extends React.Component {
@@ -36,23 +120,22 @@ class Home extends React.Component {
     $.getJSON(url, posts => this.setState({posts: posts}));
   }
 
-  _createPost() {
-    let csrfToken = Helper.getCSRFToken();
-    $.ajax({
-      method: 'POST',
-      url: '/api/posts/',
-      headers: {'X-CSRFToken': csrfToken},
-      error: response => {
-        location.href = '/accounts/login/';
-      }
-    });
+  _displayPostEditor() {
+    Helper.displayPostEditor();
+  }
+
+  _insertPost(response) {
+    let posts = this.state.posts;
+    posts.push(response);
+    this.setState({posts: posts});
   }
 
   render() {
     return (
       <div className="ui grid container">
+        <PostEditor ref="editor" categories={this.state.categories} insertPost={this._insertPost.bind(this)} />
         <div className="four wide column">
-          <button className="fluid ui primary button" onClick={this._createPost.bind(this)}>发表主题</button>
+          <button className="fluid ui primary button" onClick={this._displayPostEditor.bind(this)}>发布主题</button>
           <div className="ui large selection animated list">
             <div className="item" onClick={this._filterByCategory.bind(this, null)}>
               <i className="comment icon"></i>
