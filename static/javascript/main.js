@@ -56,9 +56,8 @@ var Helper = function () {
     key: 'displayPostEditor',
     value: function displayPostEditor() {
       this.checkLogin();
-      var sidebarSelector = '#editorSidebar';
-
-      if ($(sidebarSelector).sidebar('is hidden')) $(sidebarSelector).sidebar({ dimPage: false, closable: false }).sidebar('show');
+      var selector = '#editorModal';
+      $(selector).toggle();
     }
   }]);
 
@@ -107,7 +106,7 @@ var PostEditor = function (_React$Component) {
     value: function render() {
       return React.createElement(
         'div',
-        { className: 'ui bottom sidebar', id: 'editorSidebar', style: { padding: '10px 20px', backgroundColor: 'white' } },
+        { className: 'ui bottom modal', id: 'editorModal', style: { padding: '10px 20px' } },
         React.createElement(
           'form',
           { onSubmit: this._submit.bind(this) },
@@ -277,7 +276,7 @@ var Home = function (_React$Component2) {
               return React.createElement(
                 'div',
                 { className: 'item' },
-                React.createElement('img', { className: 'ui avatar image mini', src: post.author_gravatar }),
+                React.createElement('img', { className: 'ui avatar image mini', src: post.author_info.gravatar_url }),
                 React.createElement(
                   'div',
                   { className: 'content' },
@@ -301,7 +300,7 @@ var Home = function (_React$Component2) {
                       React.createElement(
                         'strong',
                         null,
-                        post.author
+                        post.author_info.name
                       ),
                       ' 发表'
                     )

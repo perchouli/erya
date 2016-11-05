@@ -31,11 +31,8 @@ class Helper {
 
   static displayPostEditor() {
     this.checkLogin();
-    let sidebarSelector = '#editorSidebar';
-
-    if ($(sidebarSelector).sidebar('is hidden'))
-      $(sidebarSelector).sidebar({dimPage: false, closable: false}).sidebar('show');
-
+    let selector = '#editorModal';
+    $(selector).toggle();
   }
 
 }
@@ -70,7 +67,7 @@ class PostEditor extends React.Component {
 
   render() {
     return (
-      <div className="ui bottom sidebar" id="editorSidebar" style={{padding: '10px 20px', backgroundColor: 'white'}}>
+      <div className="ui bottom modal" id="editorModal" style={{padding: '10px 20px'}}>
         <form onSubmit={this._submit.bind(this)}>
           <div className="ui form">
             <div className="fields">
@@ -161,10 +158,10 @@ class Home extends React.Component {
         {this.state.posts.map(post => {
           return(
             <div className="item">
-              <img className="ui avatar image mini" src={post.author_gravatar}/>
+              <img className="ui avatar image mini" src={post.author_info.gravatar_url}/>
               <div className="content">
               <h3 className="header"><a href={`posts/${post.id}/`}>{post.title}</a></h3>
-              <div className="meta"><p>{post.created_at} 由 <strong>{post.author}</strong> 发表</p></div>
+              <div className="meta"><p>{post.created_at} 由 <strong>{post.author_info.name}</strong> 发表</p></div>
               <div className="description">{post.content}</div>
               </div>
             </div>
