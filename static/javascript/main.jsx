@@ -61,7 +61,6 @@ class PostEditor extends React.Component {
       data: data,
       headers: {'X-CSRFToken': csrfToken},
       success: (response) => {
-        response = {title: 'test', 'content': 'test'};
         this.props.insertPost(response)
       }
     });
@@ -76,7 +75,7 @@ class PostEditor extends React.Component {
           <div className="ui form">
             <div className="fields">
               <div className="field six wide">
-                <select className="ui search dropdown">
+                <select className="ui search dropdown" name="category">
                   <option>选择分类</option>
                 {this.props.categories.map((category, i) => {
                   return <option key={i} value={category.id}>{category.name}</option>;

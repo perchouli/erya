@@ -96,7 +96,6 @@ var PostEditor = function (_React$Component) {
         data: data,
         headers: { 'X-CSRFToken': csrfToken },
         success: function success(response) {
-          response = { title: 'test', 'content': 'test' };
           _this2.props.insertPost(response);
         }
       });
@@ -123,7 +122,7 @@ var PostEditor = function (_React$Component) {
                 { className: 'field six wide' },
                 React.createElement(
                   'select',
-                  { className: 'ui search dropdown' },
+                  { className: 'ui search dropdown', name: 'category' },
                   React.createElement(
                     'option',
                     null,

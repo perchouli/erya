@@ -33,7 +33,7 @@ class PostFilter(filters.FilterSet):
     parent_isnull = django_filters.BooleanFilter(name='parent', lookup_type='isnull')
     class Meta:
         model = Post
-        fields = ('id', 'category', 'parent')
+        fields = ('id', 'author', 'category', 'parent')
 
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created_at')
@@ -44,8 +44,17 @@ class PostViewSet(viewsets.ModelViewSet):
     def create(self, request):
         if not request.user.is_authenticated():
             raise UnauthorizedException
-        else:
-            return Response()
+        data = request.data.dict()
+        data['author'] = request.user.id
+        serializer = PostSerializer(data=data)
+
+        if not serializer.is_valid():
+            return Response(serializer.errors)
+        serializer.save()
+
+        post = serializer.instance
+        post = PostSerializer(post)
+        return Response(post.data)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

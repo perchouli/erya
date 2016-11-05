@@ -14,22 +14,21 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
 
 
-
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
 
     content = serializers.SerializerMethodField()
-    author_gravatar = serializers.SerializerMethodField()
-    author = serializers.StringRelatedField(read_only=True)
     created_at = serializers.SerializerMethodField()
-
 
     def get_content(self, obj):
         return clean(obj.content, strip=True)
 
     def get_author_gravatar(self, obj):
-        return gravatar(obj.author.email)
+        gravatar_url = ''
+        if obj.author is not None:
+            gravatar_url = gravatar(obj.author.email)
+        return gravatar_url
 
     def get_created_at(self, obj):
         return timesince(obj.created_at)
