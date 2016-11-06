@@ -11,14 +11,24 @@ import erya.views
 
 urlpatterns = [
     url(r'^accounts/', include('accounts.urls')),
-    url(r'^posts/', include('posts.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^logout/$', auth_views.logout, {'next_page': '/'}, name='logout'),
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + erya.api.api_urlpatterns
 
 def global_route(request, path):
-    js_app_name = 'home' if path == '' else path.replace('/', '').lower()
-    return HttpResponse(Template('{% extends "base.html" %}{% block content %}<div id="'+js_app_name+'" />{% endblock %}').render(RequestContext(request)))
+    js_app_name = 'home' if path == '' else path.lower().split('/')[0]
+    dataset = ''
+    if js_app_name != 'home':
+        dataset_list = list(filter(len, path.lower().replace(js_app_name, '').split('/')))
+        dataset = ' '.join(
+            ['data-{0}="{1}"'.format(
+                (('id', 'action') + ('ext',) * (len(dataset_list) - 2))[i],
+                dataset_list[i]
+            )
+            for i in range(len(dataset_list))
+            ]
+        )
+    return HttpResponse(Template('{% extends "base.html" %}{% block content %}<div id="'+js_app_name+'" '+dataset+' />{% endblock %}').render(RequestContext(request)))
 
 urlpatterns.append(url(r'^(?P<path>(.*))$', global_route))
