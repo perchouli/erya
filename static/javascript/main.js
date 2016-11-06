@@ -322,28 +322,161 @@ var Home = function (_React$Component2) {
   return Home;
 }(React.Component);
 
-var ReplyList = function (_React$Component3) {
-  _inherits(ReplyList, _React$Component3);
+var Posts = function (_React$Component3) {
+  _inherits(Posts, _React$Component3);
 
-  function ReplyList(props) {
-    _classCallCheck(this, ReplyList);
+  function Posts(props) {
+    _classCallCheck(this, Posts);
 
-    var _this7 = _possibleConstructorReturn(this, (ReplyList.__proto__ || Object.getPrototypeOf(ReplyList)).call(this, props));
+    var _this7 = _possibleConstructorReturn(this, (Posts.__proto__ || Object.getPrototypeOf(Posts)).call(this, props));
 
     _this7.state = {
+      posts: [],
+      category: {},
       replies: []
     };
     return _this7;
   }
 
-  _createClass(ReplyList, [{
+  _createClass(Posts, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
       var _this8 = this;
 
+      var dataset = ReactDOM.findDOMNode(this).parentElement.dataset,
+          postId = dataset.id,
+          posts = this.state.posts;
+      $.get('/api/posts/?id=' + postId, function (response) {
+        posts = posts.concat(response);
+        _this8.setState({ category: response[0].category });
+        $.get('/api/posts/?parent=' + postId, function (response) {
+          posts = posts.concat(response);
+          _this8.setState({ posts: posts });
+        });
+      });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'div',
+        { className: 'ui grid' },
+        React.createElement(
+          'div',
+          { className: "column sixteen wide center aligned " + (this.state.category ? this.state.category.color : '') },
+          React.createElement(
+            'button',
+            { className: 'ui inverted button' },
+            React.createElement('i', { className: 'icon ' + this.state.category.icon }),
+            this.state.category.name
+          ),
+          React.createElement(
+            'h3',
+            null,
+            this.state.posts[0] ? this.state.posts[0].title : ''
+          )
+        ),
+        React.createElement('div', { className: 'ui row hidden divider' }),
+        React.createElement(
+          'div',
+          { className: 'ui grid stackable container' },
+          React.createElement(
+            'div',
+            { className: 'fourteen wide column' },
+            React.createElement(
+              'div',
+              { className: 'ui comments', style: { maxWidth: '98%' } },
+              this.state.posts.map(function (post, i) {
+                return React.createElement(
+                  'div',
+                  null,
+                  React.createElement(
+                    'div',
+                    { key: i, className: 'comment', style: { minHeight: '100px' } },
+                    React.createElement(
+                      'a',
+                      { className: 'avatar', style: { width: '4.5em' } },
+                      React.createElement('img', { src: '/images/avatar/small/christian.jpg' })
+                    ),
+                    React.createElement(
+                      'div',
+                      { className: 'content', style: { marginLeft: '5.5em' } },
+                      React.createElement(
+                        'a',
+                        { className: 'author' },
+                        post.author_info.name,
+                        'test'
+                      ),
+                      React.createElement(
+                        'div',
+                        { className: 'metadata' },
+                        React.createElement(
+                          'div',
+                          { className: 'date' },
+                          post.created_at
+                        )
+                      ),
+                      React.createElement(
+                        'div',
+                        { className: 'text' },
+                        post.content
+                      ),
+                      React.createElement(
+                        'div',
+                        { className: 'actions' },
+                        React.createElement(
+                          'a',
+                          { className: 'reply' },
+                          'Reply'
+                        )
+                      )
+                    )
+                  ),
+                  React.createElement('div', { className: 'ui divider' })
+                );
+              })
+            ),
+            React.createElement(PostEditor, { categories: [this.state.category] })
+          ),
+          React.createElement(
+            'div',
+            { className: 'two wide column' },
+            React.createElement(
+              'button',
+              { className: 'ui button primary fluid' },
+              '回复'
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return Posts;
+}(React.Component);
+
+var ReplyList = function (_React$Component4) {
+  _inherits(ReplyList, _React$Component4);
+
+  function ReplyList(props) {
+    _classCallCheck(this, ReplyList);
+
+    var _this9 = _possibleConstructorReturn(this, (ReplyList.__proto__ || Object.getPrototypeOf(ReplyList)).call(this, props));
+
+    _this9.state = {
+      replies: []
+    };
+    return _this9;
+  }
+
+  _createClass(ReplyList, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this10 = this;
+
       var postId = this.props.postId;
       $.getJSON('/api/posts/?parent=' + postId, function (replies) {
-        _this8.setState({ replies: replies });
+        _this10.setState({ replies: replies });
       });
     }
   }, {
@@ -394,7 +527,7 @@ var ReplyList = function (_React$Component3) {
   return ReplyList;
 }(React.Component);
 
-[Home, ReplyList].forEach(function (app) {
+[Home, Posts, ReplyList].forEach(function (app) {
   var name = app.name.toLowerCase();
   if (document.getElementById(name)) {
     var dom = document.getElementById(name),

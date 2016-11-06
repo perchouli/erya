@@ -175,6 +175,75 @@ class Home extends React.Component {
   }
 }
 
+class Posts extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      posts: [],
+      category: {},
+      replies: [],
+    };
+  }
+
+  componentDidMount() {
+    let dataset = ReactDOM.findDOMNode(this).parentElement.dataset,
+      postId = dataset.id,
+      posts = this.state.posts;
+    $.get('/api/posts/?id=' + postId, response => {
+      posts = posts.concat(response);
+      this.setState({category: response[0].category});
+      $.get('/api/posts/?parent=' + postId, response => {
+        posts = posts.concat(response);
+        this.setState({posts: posts});
+      });
+    });
+  }
+
+  render() {
+    return (
+      <div className="ui grid">
+        <div className={"column sixteen wide center aligned " + (this.state.category ? this.state.category.color : '')}>
+          <button className="ui inverted button"><i className={'icon ' + this.state.category.icon} />{this.state.category.name}</button>
+          <h3>{this.state.posts[0] ? this.state.posts[0].title : ''}</h3>
+        </div>
+        <div className="ui row hidden divider"></div>
+        <div className="ui grid stackable container">
+          <div className="fourteen wide column">
+            <div className="ui comments" style={{maxWidth: '98%'}}>
+            {this.state.posts.map((post, i) => {
+            return (
+            <div>
+              <div key={i} className="comment" style={{minHeight: '100px'}}>
+                <a className="avatar" style={{width: '4.5em'}}>
+                  <img src="/images/avatar/small/christian.jpg" />
+                </a>
+                <div className="content" style={{marginLeft: '5.5em'}}>
+                  <a className="author">{post.author_info.name}test</a>
+                  <div className="metadata"><div className="date">{post.created_at}</div></div>
+                  <div className="text">
+                    {post.content}
+                  </div>
+                  <div className="actions">
+                    <a className="reply">Reply</a>
+                  </div>
+                </div>
+              </div>
+              <div className="ui divider"></div>
+            </div>
+            )
+            })}
+            </div>
+            <PostEditor categories={[this.state.category]} />
+
+          </div>
+          <div className="two wide column"><button className="ui button primary fluid">回复</button></div>
+        </div>
+
+      </div>
+    )
+  }
+}
+
 class ReplyList extends React.Component {
   constructor(props) {
     super(props);
@@ -210,7 +279,7 @@ class ReplyList extends React.Component {
   }
 }
 
-[Home, ReplyList].forEach( app => {
+[Home, Posts, ReplyList].forEach( app => {
   let name = app.name.toLowerCase();
   if (document.getElementById(name)) {
     let dom = document.getElementById(name),

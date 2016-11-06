@@ -16,12 +16,13 @@ class CategorySerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
+        depth = 1
+        exclude = ('author',)
 
     content = serializers.SerializerMethodField()
     created_at = serializers.SerializerMethodField()
 
     author_info = serializers.SerializerMethodField()
-
 
     def get_content(self, obj):
         return clean(obj.content, strip=True)
@@ -34,3 +35,4 @@ class PostSerializer(serializers.ModelSerializer):
 
     def get_created_at(self, obj):
         return timesince(obj.created_at)
+
