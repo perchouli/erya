@@ -17,6 +17,7 @@ class Helper {
     $.ajax({
       async: false,
       method: 'POST',
+      data: {'login': true},
       url: '/api/posts/',
       headers: {'X-CSRFToken': csrfToken},
       error: response => {
@@ -44,8 +45,18 @@ class PostEditor extends React.Component {
     };
   }
 
-  componentDidMount() {
-    //
+  static get defaultProps() {
+    return {categories: [], posts: []}
+  }
+
+  componentDidUpdate() {
+    // Reply
+    if (this.props.posts.length !== 0) {
+      let thisDOM = ReactDOM.findDOMNode(this);
+      $(thisDOM).removeClass('modal').show();
+      
+    }
+
   }
 
   _submit(e) {
@@ -56,9 +67,11 @@ class PostEditor extends React.Component {
       method: 'POST',
       url: '/api/posts/',
       data: data,
-      headers: {'X-CSRFToken': csrfToken},
+      headers: {
+        'X-CSRFToken': csrfToken
+      },
       success: (response) => {
-        this.props.insertPost(response)
+        this.props.insertPost(response);
       }
     });
 
@@ -69,18 +82,19 @@ class PostEditor extends React.Component {
     return (
       <div className="ui bottom modal" id="editorModal" style={{padding: '10px 20px'}}>
         <form onSubmit={this._submit.bind(this)}>
+          <input type="hidden" name="parent_id" defaultValue={(this.props.posts.length !== 0) ? this.props.posts[0].id : ''} />
           <div className="ui form">
             <div className="fields">
-              <div className="field six wide">
-                <select className="ui search dropdown" name="category">
-                  <option>选择分类</option>
+              <div className="field six wide" style={{display: (this.props.posts.length !== 0) ? 'none' : ''}}>
+                <select className="ui search dropdown" name="category_id" defaultValue={this.props.posts.length !== 0 ? this.props.posts[0].category.id : ''}>
+                  <option value="0">选择分类</option>
                 {this.props.categories.map((category, i) => {
                   return <option key={i} value={category.id}>{category.name}</option>;
                 })}
                 </select>
               </div>
               <div className="field ten wide">
-                <input name="title" placeholder="输入标题" />
+                <input name="title" type={(this.props.posts.length !== 0) ? 'hidden' :'text'} placeholder="输入标题" defaultValue={(this.props.posts.length !== 0) ? this.props.posts[0].title : ''}/>
               </div>
             </div>
             <div className="field sixteen wide"><textarea name="content" placeholder="输入内容..." /></div>
@@ -122,7 +136,7 @@ class Home extends React.Component {
 
   _insertPost(response) {
     let posts = this.state.posts;
-    posts.push(response);
+    posts.unshift(response);
     this.setState({posts: posts});
   }
 
@@ -180,8 +194,7 @@ class Posts extends React.Component {
     super(props);
     this.state = {
       posts: [],
-      category: {},
-      replies: [],
+      category: {}
     };
   }
 
@@ -199,10 +212,17 @@ class Posts extends React.Component {
     });
   }
 
+  _insertPost(response) {
+    let posts = this.state.posts;
+    posts.push(response);
+    this.setState({posts: posts});
+  }
+
+
   render() {
     return (
       <div className="ui grid">
-        <div className={"column sixteen wide center aligned " + (this.state.category ? this.state.category.color : '')}>
+        <div className={"column sixteen wide center aligned " + (this.state.category.color)}>
           <button className="ui inverted button"><i className={'icon ' + this.state.category.icon} />{this.state.category.name}</button>
           <h3>{this.state.posts[0] ? this.state.posts[0].title : ''}</h3>
         </div>
@@ -215,14 +235,12 @@ class Posts extends React.Component {
             <div>
               <div key={i} className="comment" style={{minHeight: '100px'}}>
                 <a className="avatar" style={{width: '4.5em'}}>
-                  <img src="/images/avatar/small/christian.jpg" />
+                  <img src={post.author_info.gravatar_url} />
                 </a>
                 <div className="content" style={{marginLeft: '5.5em'}}>
-                  <a className="author">{post.author_info.name}test</a>
+                  <a className="author">{post.author_info.name}</a>
                   <div className="metadata"><div className="date">{post.created_at}</div></div>
-                  <div className="text">
-                    {post.content}
-                  </div>
+                  <div className="text">{post.content}</div>
                   <div className="actions">
                     <a className="reply">Reply</a>
                   </div>
@@ -233,7 +251,7 @@ class Posts extends React.Component {
             )
             })}
             </div>
-            <PostEditor categories={[this.state.category]} />
+            <PostEditor posts={this.state.posts} insertPost={this._insertPost.bind(this)} />
 
           </div>
           <div className="two wide column"><button className="ui button primary fluid">回复</button></div>

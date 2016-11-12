@@ -45,9 +45,10 @@ class PostViewSet(viewsets.ModelViewSet):
         if not request.user.is_authenticated():
             raise UnauthorizedException
         data = request.data.dict()
-        data['author'] = request.user.id
+        if 'login' in data:
+            return Response({})
+        data['author'] = request.user
         serializer = PostSerializer(data=data)
-
         if not serializer.is_valid():
             return Response(serializer.errors)
         serializer.save()
