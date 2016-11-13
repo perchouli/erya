@@ -41,7 +41,7 @@
         <div class="posts">
           {% for post in recent_posts %}
           <div class="post-preview">
-            <a href="{% url 'post_detail' post.id %}">{{post.title}}</a>
+            <a href="/posts/{{post.id}}">{{post.title}}</a>
             <small>{{post.created_at|date:"Y-m-d"}}</small>
           </div>
           {% endfor %}
