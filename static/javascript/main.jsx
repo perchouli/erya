@@ -42,27 +42,32 @@ class PostEditor extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      parentId: null
     };
   }
 
   static get defaultProps() {
-    return {categories: [], posts: []}
+    return {categories: [], posts: [], isReply: false}
+  }
+
+  componentDidMount() {
+    if (this.props.isReply) {
+      let thisDOM = ReactDOM.findDOMNode(this);
+      $(thisDOM).removeClass('modal').show();
+    }
   }
 
   componentDidUpdate() {
-    // Reply
-    if (this.props.posts.length !== 0) {
-      let thisDOM = ReactDOM.findDOMNode(this);
-      $(thisDOM).removeClass('modal').show();
-      
+    if (this.props.isReply && this.props.posts.length !== 0 && this.state.parentId === null) {
+      this.setState({parentId: this.props.posts[0].id});
     }
-
   }
 
   _submit(e) {
     let form = e.target,
       csrfToken = Helper.getCSRFToken(),
       data = $(form).serialize();
+
     $.ajax({
       method: 'POST',
       url: '/api/posts/',
@@ -82,11 +87,11 @@ class PostEditor extends React.Component {
     return (
       <div className="ui bottom modal" id="editorModal" style={{padding: '10px 20px'}}>
         <form onSubmit={this._submit.bind(this)}>
-          <input type="hidden" name="parent_id" defaultValue={(this.props.posts.length !== 0) ? this.props.posts[0].id : ''} />
+          <input type="hidden" name="parent_id" defaultValue={this.state.parentId} />
           <div className="ui form">
             <div className="fields">
-              <div className="field six wide" style={{display: (this.props.posts.length !== 0) ? 'none' : ''}}>
-                <select className="ui search dropdown" name="category_id" defaultValue={this.props.posts.length !== 0 ? this.props.posts[0].category.id : ''}>
+              <div className="field six wide" style={{display: this.props.isReply ? 'none' : ''}}>
+                <select className="ui search dropdown" name="category_id">
                   <option value="0">选择分类</option>
                 {this.props.categories.map((category, i) => {
                   return <option key={i} value={category.id}>{category.name}</option>;
@@ -94,7 +99,7 @@ class PostEditor extends React.Component {
                 </select>
               </div>
               <div className="field ten wide">
-                <input name="title" type={(this.props.posts.length !== 0) ? 'hidden' :'text'} placeholder="输入标题" defaultValue={(this.props.posts.length !== 0) ? this.props.posts[0].title : ''}/>
+                <input name="title" type={this.props.isReply ? 'hidden' :'text'} placeholder="输入标题" defaultValue={(this.props.posts.length !== 0) ? this.props.posts[0].title : ''}/>
               </div>
             </div>
             <div className="field sixteen wide"><textarea name="content" placeholder="输入内容..." /></div>
@@ -218,6 +223,10 @@ class Posts extends React.Component {
     this.setState({posts: posts});
   }
 
+  _reply(parentId) {
+    this.refs.postEditor.setState({parentId: parentId})
+  }
+
 
   render() {
     return (
@@ -242,7 +251,7 @@ class Posts extends React.Component {
                   <div className="metadata"><div className="date">{post.created_at}</div></div>
                   <div className="text">{post.content}</div>
                   <div className="actions">
-                    <a className="reply">Reply</a>
+                    <a className="reply" onClick={this._reply.bind(this, post.id)}>Reply</a>
                   </div>
                 </div>
               </div>
@@ -251,7 +260,7 @@ class Posts extends React.Component {
             )
             })}
             </div>
-            <PostEditor posts={this.state.posts} insertPost={this._insertPost.bind(this)} />
+            <PostEditor ref="postEditor" posts={this.state.posts} insertPost={this._insertPost.bind(this)} isReply={true}/>
 
           </div>
           <div className="two wide column"><button className="ui button primary fluid">回复</button></div>
@@ -262,42 +271,8 @@ class Posts extends React.Component {
   }
 }
 
-class ReplyList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      replies: [],
-    };
-  }
 
-  componentDidMount() {
-    let postId = this.props.postId;
-    $.getJSON(`/api/posts/?parent=${postId}`, replies => {
-      this.setState({replies: replies});
-    });
-  }
-  render() {
-    return (
-      <div className="ui comments">
-        {this.state.replies.map(post => {
-          return(
-            <div className="comment">
-              <a className="avatar"><img className="ui avatar image mini" src={post.author_gravatar}/></a>
-              <div className="content">
-                <a className="author" href="#">{post.author}</a>
-                <div className="metadata"><div className="date">{post.created_at} </div></div>
-                <div className="text">{post.content}</div>
-              </div>
-            </div>
-            )
-          })
-        }
-      </div>
-    );
-  }
-}
-
-[Home, Posts, ReplyList].forEach( app => {
+[Home, Posts].forEach( app => {
   let name = app.name.toLowerCase();
   if (document.getElementById(name)) {
     let dom = document.getElementById(name),

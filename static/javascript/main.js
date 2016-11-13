@@ -40,18 +40,25 @@ class Helper {
 class PostEditor extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      parentId: null
+    };
   }
 
   static get defaultProps() {
-    return { categories: [], posts: [] };
+    return { categories: [], posts: [], isReply: false };
+  }
+
+  componentDidMount() {
+    if (this.props.isReply) {
+      let thisDOM = ReactDOM.findDOMNode(this);
+      $(thisDOM).removeClass('modal').show();
+    }
   }
 
   componentDidUpdate() {
-    // Reply
-    if (this.props.posts.length !== 0) {
-      let thisDOM = ReactDOM.findDOMNode(this);
-      $(thisDOM).removeClass('modal').show();
+    if (this.props.isReply && this.props.posts.length !== 0 && this.state.parentId === null) {
+      this.setState({ parentId: this.props.posts[0].id });
     }
   }
 
@@ -59,6 +66,7 @@ class PostEditor extends React.Component {
     let form = e.target,
         csrfToken = Helper.getCSRFToken(),
         data = $(form).serialize();
+
     $.ajax({
       method: 'POST',
       url: '/api/posts/',
@@ -81,7 +89,7 @@ class PostEditor extends React.Component {
       React.createElement(
         'form',
         { onSubmit: this._submit.bind(this) },
-        React.createElement('input', { type: 'hidden', name: 'parent_id', defaultValue: this.props.posts.length !== 0 ? this.props.posts[0].id : '' }),
+        React.createElement('input', { type: 'hidden', name: 'parent_id', defaultValue: this.state.parentId }),
         React.createElement(
           'div',
           { className: 'ui form' },
@@ -90,10 +98,10 @@ class PostEditor extends React.Component {
             { className: 'fields' },
             React.createElement(
               'div',
-              { className: 'field six wide', style: { display: this.props.posts.length !== 0 ? 'none' : '' } },
+              { className: 'field six wide', style: { display: this.props.isReply ? 'none' : '' } },
               React.createElement(
                 'select',
-                { className: 'ui search dropdown', name: 'category_id', defaultValue: this.props.posts.length !== 0 ? this.props.posts[0].category.id : '' },
+                { className: 'ui search dropdown', name: 'category_id' },
                 React.createElement(
                   'option',
                   { value: '0' },
@@ -111,7 +119,7 @@ class PostEditor extends React.Component {
             React.createElement(
               'div',
               { className: 'field ten wide' },
-              React.createElement('input', { name: 'title', type: this.props.posts.length !== 0 ? 'hidden' : 'text', placeholder: '输入标题', defaultValue: this.props.posts.length !== 0 ? this.props.posts[0].title : '' })
+              React.createElement('input', { name: 'title', type: this.props.isReply ? 'hidden' : 'text', placeholder: '输入标题', defaultValue: this.props.posts.length !== 0 ? this.props.posts[0].title : '' })
             )
           ),
           React.createElement(
@@ -297,6 +305,10 @@ class Posts extends React.Component {
     this.setState({ posts: posts });
   }
 
+  _reply(parentId) {
+    this.refs.postEditor.setState({ parentId: parentId });
+  }
+
   render() {
     return React.createElement(
       'div',
@@ -365,7 +377,7 @@ class Posts extends React.Component {
                       { className: 'actions' },
                       React.createElement(
                         'a',
-                        { className: 'reply' },
+                        { className: 'reply', onClick: this._reply.bind(this, post.id) },
                         'Reply'
                       )
                     )
@@ -375,7 +387,7 @@ class Posts extends React.Component {
               );
             })
           ),
-          React.createElement(PostEditor, { posts: this.state.posts, insertPost: this._insertPost.bind(this) })
+          React.createElement(PostEditor, { ref: 'postEditor', posts: this.state.posts, insertPost: this._insertPost.bind(this), isReply: true })
         ),
         React.createElement(
           'div',
@@ -391,64 +403,7 @@ class Posts extends React.Component {
   }
 }
 
-class ReplyList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      replies: []
-    };
-  }
-
-  componentDidMount() {
-    let postId = this.props.postId;
-    $.getJSON(`/api/posts/?parent=${ postId }`, replies => {
-      this.setState({ replies: replies });
-    });
-  }
-  render() {
-    return React.createElement(
-      'div',
-      { className: 'ui comments' },
-      this.state.replies.map(post => {
-        return React.createElement(
-          'div',
-          { className: 'comment' },
-          React.createElement(
-            'a',
-            { className: 'avatar' },
-            React.createElement('img', { className: 'ui avatar image mini', src: post.author_gravatar })
-          ),
-          React.createElement(
-            'div',
-            { className: 'content' },
-            React.createElement(
-              'a',
-              { className: 'author', href: '#' },
-              post.author
-            ),
-            React.createElement(
-              'div',
-              { className: 'metadata' },
-              React.createElement(
-                'div',
-                { className: 'date' },
-                post.created_at,
-                ' '
-              )
-            ),
-            React.createElement(
-              'div',
-              { className: 'text' },
-              post.content
-            )
-          )
-        );
-      })
-    );
-  }
-}
-
-[Home, Posts, ReplyList].forEach(app => {
+[Home, Posts].forEach(app => {
   let name = app.name.toLowerCase();
   if (document.getElementById(name)) {
     let dom = document.getElementById(name),
