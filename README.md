@@ -3,17 +3,12 @@ Erya
 
 [Erya](https://github.com/perchouli/erya)是基于[SemanticUI](http://semantic-ui.com/)开发的内容发布系统，主要用来搭建BBS。
 
-
-系统的后端是简单的发布主题/回复/评论的功能，目前是基于Django(Python)的。使用Python3 + Django的架构，Python2.7测试通过。
-
-前端使用SemanticUI，支持自适应，编辑器使用[Quilljs](http://quilljs.com/)，同样也是支持自适应的：
-
-因为是面向国内中文用户，所以没有Google的JS/字体API等容易被墙掉的特性。
+系统的后端实现简单的REST接口，目前使用Python3 + Django的架构，Python2.7测试通过。
 
 
 ## 安装
 
-下载[zip包](https://github.com/perchouli/erya/archive/master.zip)解压或是直接clone，用pip3安装Django。建议使用Python3运行。
+下载[zip包](https://github.com/perchouli/erya/archive/master.zip)解压或是直接clone，用pip3安装Django。
 
     git clone https://github.com/perchouli/erya.git
     cd erya
