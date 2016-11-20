@@ -1,3 +1,4 @@
+
 # encoding: utf8
 from django.apps import AppConfig
 from django.db import models
@@ -12,11 +13,13 @@ import re
 
 class Category(models.Model):
     COLOR_CHOICES = (
-        ('red', '红色'),
-        ('blue', '蓝色'),
-        ('green', '绿色'),
-        ('purpel', '紫色'),
-        ('black', '黑色'),
+        ('red', 'Red'),
+        ('orange', 'Orange'),
+        ('yellow', 'Yellow'),
+        ('blue', 'Blue'),
+        ('green', 'Green'),
+        ('purpel', 'Purpel'),
+        ('black', 'Black'),
     )
     name = models.CharField(max_length=32)
     sort = models.IntegerField(null=True, blank=True)

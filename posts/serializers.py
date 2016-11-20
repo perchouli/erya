@@ -27,6 +27,7 @@ class PostSerializer(serializers.ModelSerializer):
 
     def to_internal_value(self, data):
        #TODO: validate
+        data['parent_id'] = data['parent_id'] if data['parent_id'].isdigit() else None
         return data
 
     def get_content(self, obj):
