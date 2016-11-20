@@ -199,7 +199,11 @@ class Posts extends React.Component {
     super(props);
     this.state = {
       posts: [],
-      category: {}
+      category: {
+        'icon': null,
+        'name': null,
+        'color': null
+      }
     };
   }
 
@@ -209,7 +213,7 @@ class Posts extends React.Component {
       posts = this.state.posts;
     $.get('/api/posts/?id=' + postId, response => {
       posts = posts.concat(response);
-      this.setState({category: response[0].category});
+      this.setState({category: response[0].category || this.state.category});
       $.get('/api/posts/?parent=' + postId, response => {
         posts = posts.concat(response);
         this.setState({posts: posts});
