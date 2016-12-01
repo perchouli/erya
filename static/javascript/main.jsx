@@ -4,7 +4,7 @@ class Helper {
     if (document.cookie && document.cookie !== '') {
       document.cookie.split(';').forEach(cookie => {
         let [name, value] = cookie.split('=');
-        if (name === 'csrftoken')
+        if (name.trim() === 'csrftoken')
           csrfToken = value;
       });
     }
@@ -147,7 +147,7 @@ class Home extends React.Component {
 
   render() {
     return (
-      <div className="ui grid container">
+      <div className="ui grid container stackable">
         <PostEditor ref="editor" categories={this.state.categories} insertPost={this._insertPost.bind(this)} />
         <div className="four wide column">
           <button className="fluid ui primary button" onClick={this._displayPostEditor.bind(this)}>发布主题</button>

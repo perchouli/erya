@@ -4,7 +4,7 @@ class Helper {
     if (document.cookie && document.cookie !== '') {
       document.cookie.split(';').forEach(cookie => {
         let [name, value] = cookie.split('=');
-        if (name === 'csrftoken') csrfToken = value;
+        if (name.trim() === 'csrftoken') csrfToken = value;
       });
     }
     return csrfToken;
@@ -175,7 +175,7 @@ class Home extends React.Component {
   render() {
     return React.createElement(
       'div',
-      { className: 'ui grid container' },
+      { className: 'ui grid container stackable' },
       React.createElement(PostEditor, { ref: 'editor', categories: this.state.categories, insertPost: this._insertPost.bind(this) }),
       React.createElement(
         'div',
