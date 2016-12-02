@@ -1,0 +1,22 @@
+{
+    "extends": "standard",
+    "plugins": [
+        "standard",
+        "promise"
+    ],
+    "rules": {
+        "semi": ["error", "always"],
+    "one-var": [2, {
+        "var": "always",
+        "let": "always",
+        "const": "never"
+    }]
+
+    },
+    "globals": {
+        "location": true,
+        "$": true,
+        "React": true,
+        "ReactDOM": true
+    }
+}

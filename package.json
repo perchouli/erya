@@ -1,0 +1,34 @@
+{
+  "name": "erya",
+  "private": true,
+  "version": "0.0.1",
+  "commonerConfig": {
+    "version": 7
+  },
+  "main": "build/index.js",
+  "dependencies": {},
+  "scripts": {
+    "eslint": "eslint static/javascript/main.jsx",
+    "babel:watch": "babel -w static/javascript/main.jsx --out-file=static/javascript/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/perchouli/erya.git"
+  },
+  "author": "Perchouli",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/perchouli/erya/issues"
+  },
+  "homepage": "https://github.com/perchouli/erya#readme",
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-react": "^6.16.0",
+    "eslint": "^3.11.1",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-standard": "^2.0.1"
+  }
+}
