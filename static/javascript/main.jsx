@@ -113,21 +113,19 @@ class PostEditor extends React.Component {
 }
 
 class CategoryChildren extends React.Component {
-  constructor (props) {
-    super(props);
-    this.categories = Object.entries(this.props).map(p => { return p[1]; });
-  }
-  render () {
-    if (this.categories.length === 0) {
-      return null;
+  componentDidMount () {
+    let thisDOM = ReactDOM.findDOMNode(this);
+    if (thisDOM !== null) {
+      thisDOM.style.marginLeft = '1em';
+      thisDOM.parentElement.parentElement.appendChild(thisDOM);
     }
+  }
+
+  render () {
     return (
-      <div className="list">
-        {this.categories.map((category, i) => {
-          return (
-            <div className="item"><i className={(category.icon || 'square') + ' icon'}></i><div className="content">{category.name}</div></div>
-          );
-        })}
+      <div className="item" onClick={this.props.event.bind(this, this.props.id)}>
+        <i className={(this.props.icon || 'square') + ' icon'}></i>
+        <div className="content">{this.props.name}</div>
       </div>
     );
   }
@@ -152,9 +150,10 @@ class Home extends React.Component {
     });
   }
 
-  _filterByCategory (categoryId) {
+  _filterByCategory (categoryId, e) {
     let url = '/api/posts/?parent_isnull=True' + (categoryId === null ? '' : '&category=' + categoryId);
     $.getJSON(url, posts => this.setState({posts: posts}));
+    e.stopPropagation();
   }
 
   _displayPostEditor () {
@@ -173,7 +172,7 @@ class Home extends React.Component {
         <PostEditor ref="editor" categories={this.state.categories} insertPost={this._insertPost.bind(this)} />
         <div className="four wide column">
           <button className="fluid ui primary button" onClick={this._displayPostEditor.bind(this)}>发布主题</button>
-          <div className="ui large selection list">
+          <div className="ui large selection list animated">
             <div className="item" onClick={this._filterByCategory.bind(this, null)}>
               <i className="comment icon"></i>
               <div className="content">所有主题</div>
@@ -183,15 +182,16 @@ class Home extends React.Component {
               <div className="content">所有分类</div>
             </div>
             <div className="ui divider"></div>
-        {this.state.categories.map((category, i) => {
+        {this.state.categories.filter(c => { return c.parent == null; }).map((category, i) => {
           return (
             <div key={i} className="item" onClick={this._filterByCategory.bind(this, category.id)}>
               <i className={(category.icon || 'square') + ' icon'}></i>
               <div className="content">
                 <div className="description">{category.name}</div>
-                <CategoryChildren {...category.children} />
               </div>
-
+              {Object.entries(category.children).map(p => { return p[1]; }).map((category, i) => {
+                return (<CategoryChildren event={this._filterByCategory.bind(this)} {...category} />);
+              })}
             </div>
           );
         })}

@@ -1,5 +1,7 @@
 'use strict';
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -186,38 +188,33 @@ var PostEditor = function (_React$Component) {
 var CategoryChildren = function (_React$Component2) {
   _inherits(CategoryChildren, _React$Component2);
 
-  function CategoryChildren(props) {
+  function CategoryChildren() {
     _classCallCheck(this, CategoryChildren);
 
-    var _this3 = _possibleConstructorReturn(this, (CategoryChildren.__proto__ || Object.getPrototypeOf(CategoryChildren)).call(this, props));
-
-    _this3.categories = Object.entries(_this3.props).map(function (p) {
-      return p[1];
-    });
-    return _this3;
+    return _possibleConstructorReturn(this, (CategoryChildren.__proto__ || Object.getPrototypeOf(CategoryChildren)).apply(this, arguments));
   }
 
   _createClass(CategoryChildren, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var thisDOM = ReactDOM.findDOMNode(this);
+      if (thisDOM !== null) {
+        thisDOM.style.marginLeft = '1em';
+        thisDOM.parentElement.parentElement.appendChild(thisDOM);
+      }
+    }
+  }, {
     key: 'render',
     value: function render() {
-      if (this.categories.length === 0) {
-        return null;
-      }
       return React.createElement(
         'div',
-        { className: 'list' },
-        this.categories.map(function (category, i) {
-          return React.createElement(
-            'div',
-            { className: 'item' },
-            React.createElement('i', { className: (category.icon || 'square') + ' icon' }),
-            React.createElement(
-              'div',
-              { className: 'content' },
-              category.name
-            )
-          );
-        })
+        { className: 'item', onClick: this.props.event.bind(this, this.props.id) },
+        React.createElement('i', { className: (this.props.icon || 'square') + ' icon' }),
+        React.createElement(
+          'div',
+          { className: 'content' },
+          this.props.name
+        )
       );
     }
   }]);
@@ -255,13 +252,14 @@ var Home = function (_React$Component3) {
     }
   }, {
     key: '_filterByCategory',
-    value: function _filterByCategory(categoryId) {
+    value: function _filterByCategory(categoryId, e) {
       var _this6 = this;
 
       var url = '/api/posts/?parent_isnull=True' + (categoryId === null ? '' : '&category=' + categoryId);
       $.getJSON(url, function (posts) {
         return _this6.setState({ posts: posts });
       });
+      e.stopPropagation();
     }
   }, {
     key: '_displayPostEditor',
@@ -294,7 +292,7 @@ var Home = function (_React$Component3) {
           ),
           React.createElement(
             'div',
-            { className: 'ui large selection list' },
+            { className: 'ui large selection list animated' },
             React.createElement(
               'div',
               { className: 'item', onClick: this._filterByCategory.bind(this, null) },
@@ -316,7 +314,9 @@ var Home = function (_React$Component3) {
               )
             ),
             React.createElement('div', { className: 'ui divider' }),
-            this.state.categories.map(function (category, i) {
+            this.state.categories.filter(function (c) {
+              return c.parent == null;
+            }).map(function (category, i) {
               return React.createElement(
                 'div',
                 { key: i, className: 'item', onClick: _this7._filterByCategory.bind(_this7, category.id) },
@@ -328,9 +328,13 @@ var Home = function (_React$Component3) {
                     'div',
                     { className: 'description' },
                     category.name
-                  ),
-                  React.createElement(CategoryChildren, category.children)
-                )
+                  )
+                ),
+                Object.entries(category.children).map(function (p) {
+                  return p[1];
+                }).map(function (category, i) {
+                  return React.createElement(CategoryChildren, _extends({ event: _this7._filterByCategory.bind(_this7) }, category));
+                })
               );
             })
           )
