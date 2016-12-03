@@ -1,17 +1,18 @@
 class Helper {
-  static getCSRFToken() {
+  static getCSRFToken () {
     let csrfToken = '';
     if (document.cookie && document.cookie !== '') {
       document.cookie.split(';').forEach(cookie => {
         let [name, value] = cookie.split('=');
-        if (name.trim() === 'csrftoken')
+        if (name.trim() === 'csrftoken') {
           csrfToken = value;
+        }
       });
     }
     return csrfToken;
   }
 
-  static checkLogin() {
+  static checkLogin () {
     let csrfToken = this.getCSRFToken(),
       isLogin = false;
     $.ajax({
@@ -30,7 +31,7 @@ class Helper {
     return isLogin;
   }
 
-  static displayPostEditor() {
+  static displayPostEditor () {
     this.checkLogin();
     let selector = '#editorModal';
     $(selector).toggle();
@@ -39,31 +40,31 @@ class Helper {
 }
 
 class PostEditor extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props);
     this.state = {
       parentId: null
     };
   }
 
-  static get defaultProps() {
-    return {categories: [], posts: [], isReply: false}
+  static get defaultProps () {
+    return {categories: [], posts: [], isReply: false};
   }
 
-  componentDidMount() {
+  componentDidMount () {
     if (this.props.isReply) {
       let thisDOM = ReactDOM.findDOMNode(this);
       $(thisDOM).removeClass('modal').show();
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate () {
     if (this.props.isReply && this.props.posts.length !== 0 && this.state.parentId === null) {
       this.setState({parentId: this.props.posts[0].id});
     }
   }
 
-  _submit(e) {
+  _submit (e) {
     let form = e.target,
       csrfToken = Helper.getCSRFToken(),
       data = $(form).serialize();
@@ -83,7 +84,7 @@ class PostEditor extends React.Component {
     e.preventDefault();
   }
 
-  render() {
+  render () {
     return (
       <div className="ui bottom modal" id="editorModal" style={{padding: '10px 20px'}}>
         <form onSubmit={this._submit.bind(this)}>
@@ -99,7 +100,7 @@ class PostEditor extends React.Component {
                 </select>
               </div>
               <div className="field ten wide">
-                <input name="title" type={this.props.isReply ? 'hidden' :'text'} placeholder="输入标题" defaultValue={(this.props.posts.length !== 0) ? this.props.posts[0].title : ''}/>
+                <input name="title" type={this.props.isReply ? 'hidden' : 'text'} placeholder="输入标题" defaultValue={(this.props.posts.length !== 0) ? this.props.posts[0].title : ''} />
               </div>
             </div>
             <div className="field sixteen wide"><textarea name="content" placeholder="输入内容..." /></div>
@@ -111,16 +112,37 @@ class PostEditor extends React.Component {
   }
 }
 
+class CategoryChildren extends React.Component {
+  constructor (props) {
+    super(props);
+    this.categories = Object.entries(this.props).map(p => { return p[1]; });
+  }
+  render () {
+    if (this.categories.length === 0) {
+      return null;
+    }
+    return (
+      <div className="list">
+        {this.categories.map((category, i) => {
+          return (
+            <div className="item"><i className={(category.icon || 'square') + ' icon'}></i><div className="content">{category.name}</div></div>
+          );
+        })}
+      </div>
+    );
+  }
+}
+
 class Home extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props);
     this.state = {
       categories: [],
-      posts: [],
+      posts: []
     };
   }
 
-  componentDidMount() {
+  componentDidMount () {
     $.getJSON('/api/categories/', categories => {
       this.setState({categories: categories});
     });
@@ -130,28 +152,28 @@ class Home extends React.Component {
     });
   }
 
-  _filterByCategory(categoryId) {
+  _filterByCategory (categoryId) {
     let url = '/api/posts/?parent_isnull=True' + (categoryId === null ? '' : '&category=' + categoryId);
     $.getJSON(url, posts => this.setState({posts: posts}));
   }
 
-  _displayPostEditor() {
+  _displayPostEditor () {
     Helper.displayPostEditor();
   }
 
-  _insertPost(response) {
+  _insertPost (response) {
     let posts = this.state.posts;
     posts.unshift(response);
     this.setState({posts: posts});
   }
 
-  render() {
+  render () {
     return (
       <div className="ui grid container stackable">
         <PostEditor ref="editor" categories={this.state.categories} insertPost={this._insertPost.bind(this)} />
         <div className="four wide column">
           <button className="fluid ui primary button" onClick={this._displayPostEditor.bind(this)}>发布主题</button>
-          <div className="ui large selection animated list">
+          <div className="ui large selection list">
             <div className="item" onClick={this._filterByCategory.bind(this, null)}>
               <i className="comment icon"></i>
               <div className="content">所有主题</div>
@@ -162,31 +184,35 @@ class Home extends React.Component {
             </div>
             <div className="ui divider"></div>
         {this.state.categories.map((category, i) => {
-          return(
+          return (
             <div key={i} className="item" onClick={this._filterByCategory.bind(this, category.id)}>
               <i className={(category.icon || 'square') + ' icon'}></i>
-              <div className="content">{category.name}</div>
+              <div className="content">
+                <div className="description">{category.name}</div>
+                <CategoryChildren {...category.children} />
+              </div>
+
             </div>
-          )
+          );
         })}
           </div>
         </div>
 
         <div className="twelve wide column">
           <div className="ui very relaxed list">
-        {this.state.posts.map(post => {
-          return(
-            <div className="item">
-              <img className="ui avatar image mini" src={post.author_info.gravatar_url}/>
-              <div className="content">
-              <h3 className="header"><a href={`posts/${post.id}/`}>{post.title}</a></h3>
-              <div className="meta"><p>{post.created_at} 由 <strong>{post.author_info.name}</strong> 发表</p></div>
-              <div className="description">{post.content}</div>
+          {this.state.posts.map((post, i) => {
+            return (
+              <div key={i} className="item">
+                <img className="ui avatar image mini" src={post.author_info.gravatar_url}/>
+                <div className="content">
+                <h3 className="header"><a href={`posts/${post.id}/`}>{post.title}</a></h3>
+                <div className="meta"><p>{post.created_at} 由 <strong>{post.author_info.name}</strong> 发表</p></div>
+                <div className="description">{post.content}</div>
+                </div>
               </div>
-            </div>
-            )
+            );
           })
-        }
+          }
           </div>
         </div>
       </div>
@@ -195,7 +221,7 @@ class Home extends React.Component {
 }
 
 class Posts extends React.Component {
-  constructor(props) {
+  constructor (props) {
     super(props);
     this.state = {
       posts: [],
@@ -207,7 +233,7 @@ class Posts extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount () {
     let dataset = ReactDOM.findDOMNode(this).parentElement.dataset,
       postId = dataset.id,
       posts = this.state.posts;
@@ -221,21 +247,20 @@ class Posts extends React.Component {
     });
   }
 
-  _insertPost(response) {
+  _insertPost (response) {
     let posts = this.state.posts;
     posts.push(response);
     this.setState({posts: posts});
   }
 
-  _reply(parentId) {
-    this.refs.postEditor.setState({parentId: parentId})
+  _reply (parentId) {
+    this.refs.postEditor.setState({parentId: parentId});
   }
 
-
-  render() {
+  render () {
     return (
       <div className="ui grid">
-        <div className={"column sixteen wide center aligned " + (this.state.category.color)}>
+        <div className={'column sixteen wide center aligned ' + (this.state.category.color)}>
           <button className="ui inverted button"><i className={'icon ' + this.state.category.icon} />{this.state.category.name}</button>
           <h3>{this.state.posts[0] ? this.state.posts[0].title : ''}</h3>
         </div>
@@ -244,24 +269,24 @@ class Posts extends React.Component {
           <div className="fourteen wide column">
             <div className="ui comments" style={{maxWidth: '98%'}}>
             {this.state.posts.map((post, i) => {
-            return (
-            <div>
-              <div key={i} className="comment" style={{minHeight: '100px'}}>
-                <a className="avatar" style={{width: '4.5em'}}>
-                  <img src={post.author_info.gravatar_url} />
-                </a>
-                <div className="content" style={{marginLeft: '5.5em'}}>
-                  <a className="author">{post.author_info.name}</a>
-                  <div className="metadata"><div className="date">{post.created_at}</div></div>
-                  <div className="text">{post.content}</div>
-                  <div className="actions">
-                    <a className="reply" onClick={this._reply.bind(this, post.id)}>Reply</a>
+              return (
+              <div>
+                <div key={i} className="comment" style={{minHeight: '100px'}}>
+                  <a className="avatar" style={{width: '4.5em'}}>
+                    <img src={post.author_info.gravatar_url} />
+                  </a>
+                  <div className="content" style={{marginLeft: '5.5em'}}>
+                    <a className="author">{post.author_info.name}</a>
+                    <div className="metadata"><div className="date">{post.created_at}</div></div>
+                    <div className="text">{post.content}</div>
+                    <div className="actions">
+                      <a className="reply" onClick={this._reply.bind(this, post.id)}>Reply</a>
+                    </div>
                   </div>
                 </div>
+                <div className="ui divider"></div>
               </div>
-              <div className="ui divider"></div>
-            </div>
-            )
+              );
             })}
             </div>
             <PostEditor ref="postEditor" posts={this.state.posts} insertPost={this._insertPost.bind(this)} isReply={true}/>
@@ -271,12 +296,11 @@ class Posts extends React.Component {
         </div>
 
       </div>
-    )
+    );
   }
 }
 
-
-[Home, Posts].forEach( app => {
+[Home, Posts].forEach(app => {
   let name = app.name.toLowerCase();
   if (document.getElementById(name)) {
     let dom = document.getElementById(name),

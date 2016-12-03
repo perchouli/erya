@@ -8,10 +8,21 @@ from accounts.serializers import UserSerializer
 
 from bleach import clean
 
+class CategoryChildSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
 
+    children = serializers.SerializerMethodField()
+
+    def get_children(self, obj):
+        categories = Category.objects.filter(parent_id=obj.id)
+        serializer = CategoryChildSerializer(instance=categories, many=True)
+        return serializer.data
 
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
